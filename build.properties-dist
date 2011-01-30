@@ -1,0 +1,33 @@
+# Configure the project definitions here
+project.name=Open Power Libs
+project.filename=opl
+project.version=3.0-devel
+project.stability.release=devel
+project.stability.api=devel
+project.license=New BSD
+project.license-url=http://www.invenzzia.org/license/new-bsd
+project.copyright-year=2011
+
+# Configure your build directories here
+project.directory.build=./build
+project.directory.output=./output
+
+# Git deployment
+
+
+# SCP deployment
+remote.enabled=no
+remote.host=localhost
+remote.user=username
+remote.pubkey=/path/to/sshkey.pub
+remote.privkey=/path/to/sshkey
+remote.path.download=/path/to/download
+remote.path.phar=/path/to/download
+
+# PEAR
+
+pear.name=Opl_Autoloader
+pear.classdir=Opl/Autoloader
+pear.summary=OPL 3.0 autoloader collection
+pear.description=A collection of universal class autoloaders compatible with PSR-0 class naming convention.
+pear.notes=This is a development release. It should not be used in the production systems.

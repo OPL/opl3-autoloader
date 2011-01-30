@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<package version="2.0" xmlns="http://pear.php.net/dtd/package-2.0"
+    xmlns:tasks="http://pear.php.net/dtd/tasks-1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
+http://pear.php.net/dtd/tasks-1.0.xsd
+http://pear.php.net/dtd/package-2.0
+http://pear.php.net/dtd/package-2.0.xsd">
+	<name>##PEAR_NAME##</name>
+	<channel>pear.invenzzia.org</channel>
+	<summary>##PEAR_SUMMARY##</summary>
+	<description>##PEAR_DESCRIPTION##</description>
+
+	<lead>
+		<name>Tomasz Jędrzejewski</name>
+		<user>zyxist</user>
+		<email>nightstorm@tlen.pl</email>
+		<active>yes</active>
+	</lead>
+
+	<date>##RELEASE_DATE##</date>
+
+	<version>
+		<release>##PROJECT_VERSION##</release>
+		<api>##PROJECT_VERSION##</api>
+	</version>
+	<stability>
+		<release>##RELEASE_STABILITY##</release>
+		<api>##API_STABILITY##</api>
+	</stability>
+
+	<license uri="##LICENSE_URL##">##LICENSE_NAME##</license>
+
+	<notes>##PEAR_NOTES##</notes>
+
+	<contents>
+		<dir baseinstalldir="/" name="/">
+			<file baseinstalldir="/" name="Opl/Autoloader/Command/ClassMapBuild.php" role="php" />
+			<file baseinstalldir="/" name="Opl/Autoloader/PHARLoader.php" role="php" />
+			<file baseinstalldir="/" name="Opl/Autoloader/ClassMapLoader.php" role="php" />
+			<file baseinstalldir="/" name="Opl/Autoloader/ClassMapBuilder.php" role="php" />
+			<file baseinstalldir="/" name="Opl/Autoloader/GenericLoader.php" role="php" />
+		</dir>
+	</contents>
+
+	<dependencies>
+		<required>
+			<php><min>5.3.0</min></php>
+			<pearinstaller><min>1.4.0</min></pearinstaller>
+		</required>
+	</dependencies>
+
+	<phprelease>
+	</phprelease>
+</package>

@@ -1,0 +1,11 @@
+build
+build/*
+output
+output/*
+autoload.php
+build.properties
+tests/cache/*
+tests/coverage/*
+tests/bootstrap.php
+catalog.xml
+nbproject/*

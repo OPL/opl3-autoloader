@@ -10,6 +10,11 @@
  * and other contributors. See website for details.
  */
 namespace Opl\Autoloader;
+use FilesystemIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RecursiveRegexIterator;
+use RegexIterator;
 
 /**
  * This utility can produce class maps for PHARLoader and ClassMapLoader.
@@ -58,17 +63,22 @@ class ClassMapBuilder
 	 */
 	public function addLibrary($libraryName, $path, $extension = '.php')
 	{
+		if($path[strlen($path) - 1] != '/')
+		{
+			$path .= '/';
+		}
+
 		$iterator = new RecursiveIteratorIterator(
 				new RecursiveDirectoryIterator($path.$libraryName)
 			);
 		$errors = array();
 		foreach($iterator as $name => $fileEntry)
 		{
-			if(!preg_match('/^.+\.'.$extension.'$/i', $name))
+			
+			if(!preg_match('/'.str_replace('.', '\\.', $extension).'$/i', $name))
 			{
 				continue;
 			}
-
 			$file = fopen($fileEntry->getPathname(), 'r');
 			if(!is_resource($file))
 			{

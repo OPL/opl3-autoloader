@@ -10,6 +10,7 @@
  * and other contributors. See website for details.
  */
 namespace Opl\Autoloader;
+use RuntimeException;
 
 /**
  * The generic class autoloader is a slightly enhanced version of the

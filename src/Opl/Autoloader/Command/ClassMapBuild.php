@@ -54,12 +54,12 @@ class ClassMapBuild extends Command
 			->setHelp(<<<EOF
 The <info>autoloader:class-map:build</info> command is responsible for building
 the class maps for the ClassMapLoader autoloader. The configuration is given as
-an INI file, where each entry represents a single library and a path to its code:
+an INI file, where each entry represents a single top-level namespace and a path to its code:
 
   [config]
-  extension = "php"
+  extension = "./php"
   
-  [libraries]
+  [namespaces]
   Opl = "../libs/"
   Foo = "../libs/"
   Bar = "../other/"
@@ -105,33 +105,33 @@ EOF
 			}
 		}
 
-		if(!isset($data['libraries']))
+		if(!isset($data['namespaces']))
 		{
-			$output->writeln('<error>No libraries specified!</error>');
+			$output->writeln('<error>No namespaces specified!</error>');
 		}
 
 		$this->_builder = new ClassMapBuilder();
-		foreach($data['libraries'] as $name => $path)
+		foreach($data['namespaces'] as $name => $path)
 		{
-			$this->_processSingleLibrary($output, $name, $path, $extension);
+			$this->_processSingleNamespace($output, $name, $path, $extension);
 		}
 		file_put_contents($outputFile, serialize($this->_builder->getMap()));
 		$output->writeln('<info>Map saved as:</info> '.$outputFile);
 	} // end execute();
 
 	/**
-	 * Processes a single class library.
+	 * Processes a single top-level namespace.
 	 *
 	 * @param string $name
 	 * @param string $path
 	 */
-	protected function _processSingleLibrary(OutputInterface $output, $libraryName, $path, $extension)
+	protected function _processSingleNamespace(OutputInterface $output, $namespaceName, $path, $extension)
 	{
-		$errors = $this->_builder->addLibrary($libraryName, $path, $extension);
+		$errors = $this->_builder->addNamespace($namespaceName, $path, $extension);
 
 		foreach($errors as $error)
 		{
 			$output->writeln(preg_replace('/^(([^\:]+)\:) (.*)$/', '<error>$1</error> $2', $error));
 		}
-	} // end _processSingleLibrary();
+	} // end _processSingleNamespace();
 } // end ClassMapBuild;

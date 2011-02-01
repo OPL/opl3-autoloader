@@ -34,7 +34,7 @@ class PHARLoaderTest extends \PHPUnit_Framework_TestCase
 		$phar->buildFromDirectory('./data/');
 
 		$builder = new ClassMapBuilder();
-		$builder->addLibrary('Dummy', './data/');
+		$builder->addNamespace('Dummy', './data/');
 
 		$phar->setStub(file_get_contents(__DIR__.'/../../src/Opl/Autoloader/PHARLoader.php').'
 $loader = new PHARLoader('.var_export($builder->getMap(), true).');

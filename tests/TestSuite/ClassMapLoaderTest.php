@@ -58,82 +58,82 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals('./bar/joe/', $loader->getDefaultPath());
 	} // end testSetDefaultPathAppendsSlash();
 
-	public function testAddingLibrary()
+	public function testAddingNamespace()
 	{
 		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
 
-		$this->assertFalse($loader->hasLibrary('Foo'));
-		$this->assertFalse($loader->hasLibrary('Bar'));
+		$this->assertFalse($loader->hasNamespace('Foo'));
+		$this->assertFalse($loader->hasNamespace('Bar'));
 
-		$loader->addLibrary('Foo');
+		$loader->addNamespace('Foo');
 
-		$this->assertTrue($loader->hasLibrary('Foo'));
-		$this->assertFalse($loader->hasLibrary('Bar'));
-	} // end testAddingLibrary();
+		$this->assertTrue($loader->hasNamespace('Foo'));
+		$this->assertFalse($loader->hasNamespace('Bar'));
+	} // end testAddingNamespace();
 
-	public function testAddLibrarySetsDefaultPath()
+	public function testAddNamespaceSetsDefaultPath()
 	{
 		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
-		$loader->addLibrary('Foo');
+		$loader->addNamespace('Foo');
 
 		$reflection = new \ReflectionObject($loader);
-		$librariesProperty = $reflection->getProperty('_libraries');
-		$librariesProperty->setAccessible(true);
+		$namespacesProperty = $reflection->getProperty('_namespaces');
+		$namespacesProperty->setAccessible(true);
 
-		$this->assertEquals(array('Foo' => './foo/bar/'), $librariesProperty->getValue($loader));
-	} // end testAddLibrarySetsDefaultPath();
+		$this->assertEquals(array('Foo' => './foo/bar/'), $namespacesProperty->getValue($loader));
+	} // end testAddNamespaceSetsDefaultPath();
 
-	public function testAddLibrarySetsCustomPath()
+	public function testAddNamespaceSetsCustomPath()
 	{
 		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
-		$loader->addLibrary('Foo', './bar/joe/');
+		$loader->addNamespace('Foo', './bar/joe/');
 
 		$reflection = new \ReflectionObject($loader);
-		$librariesProperty = $reflection->getProperty('_libraries');
-		$librariesProperty->setAccessible(true);
+		$namespacesProperty = $reflection->getProperty('_namespaces');
+		$namespacesProperty->setAccessible(true);
 
-		$this->assertEquals(array('Foo' => './bar/joe/'), $librariesProperty->getValue($loader));
-	} // end testAddLibrarySetsCustomPath();
+		$this->assertEquals(array('Foo' => './bar/joe/'), $namespacesProperty->getValue($loader));
+	} // end testAddNamespaceSetsCustomPath();
 
 	/**
 	 * @expectedException RuntimeException
 	 */
-	public function testAddLibraryThrowsExceptionWhenLibraryExists()
+	public function testAddNamespaceThrowsExceptionWhenNamespaceExists()
 	{
 		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
-		$loader->addLibrary('Foo');
-		$this->assertTrue($loader->hasLibrary('Foo'));
-		$loader->addLibrary('Foo');
-	} // end testAddLibraryThrowsExceptionWhenLibraryExists();
+		$loader->addNamespace('Foo');
+		$this->assertTrue($loader->hasNamespace('Foo'));
+		$loader->addNamespace('Foo');
+	} // end testAddNamespaceThrowsExceptionWhenNamespaceExists();
 
-	public function testRemoveLibrary()
+	public function testRemoveNamespace()
 	{
 		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
-		$loader->addLibrary('Foo');
-		$this->assertTrue($loader->hasLibrary('Foo'));
+		$loader->addNamespace('Foo');
+		$this->assertTrue($loader->hasNamespace('Foo'));
 
 		$reflection = new \ReflectionObject($loader);
-		$librariesProperty = $reflection->getProperty('_libraries');
-		$librariesProperty->setAccessible(true);
+		$namespacesProperty = $reflection->getProperty('_namespaces');
+		$namespacesProperty->setAccessible(true);
 
-		$this->assertEquals(array('Foo' => './foo/bar/'), $librariesProperty->getValue($loader));
+		$this->assertEquals(array('Foo' => './foo/bar/'), $namespacesProperty->getValue($loader));
 
-		$loader->removeLibrary('Foo');
-		$this->assertFalse($loader->hasLibrary('Foo'));
+		$loader->removeNamespace('Foo');
+		$this->assertFalse($loader->hasNamespace('Foo'));
 
-		$this->assertEquals(array(), $librariesProperty->getValue($loader));
-	} // end testRemoveLibrary();
+		$this->assertEquals(array(), $namespacesProperty->getValue($loader));
+	} // end testRemoveNamespace();
 
 	/**
-	 * @depends testRemoveLibrary
+	 * @depends testRemoveNamespace
 	 * @expectedException RuntimeException
 	 */
-	public function testRemoveLibraryThrowsExceptionWhenLibraryDoesNotExist()
+	public function testRemoveNamespaceThrowsExceptionWhenNamespaceDoesNotExist()
 	{
 		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
-		$this->assertFalse($loader->hasLibrary('Moo'));
-		$loader->removeLibrary('Moo');
-	} // end testRemoveLibraryThrowsExceptionWhenLibraryDoesNotExist();
+		$this->assertFalse($loader->hasNamespace('Moo'));
+		$loader->removeNamespace('Moo');
+	} // end testRemoveNamespaceThrowsExceptionWhenNamespaceDoesNotExist();
 
 	public function testRegisterWorks()
 	{
@@ -161,7 +161,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	public function testLoadingClasses()
 	{
 		$loader = new ClassMapLoader('./data/', './data/classMap.txt');
-		$loader->addLibrary('Dummy');
+		$loader->addNamespace('Dummy');
 		$loader->register();
 
 		// No error should happen here.
@@ -171,7 +171,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	public function testSkippingUnknownClasses()
 	{
 		$loader = new ClassMapLoader('./data/', './data/classMap.txt');
-		$loader->addLibrary('Dummy');
+		$loader->addNamespace('Dummy');
 		$loader->register();
 
 		spl_autoload_register(function($name){ echo 'yey'; return true; });

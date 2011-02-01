@@ -240,4 +240,17 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 		spl_autoload_call('Foo\\Bar_Joe\\Goo');
 		$this->assertEquals('FOO\\BAR_JOE\\GOO.PHP', ob_get_clean());
 	} // end testLoaderDoesNotReplaceUnderscoresToSlashesInNamespace();
+
+	public function testSkippingUnknownLibraries()
+	{
+		$loader = new GenericLoader('\\', './foo/bar/');
+		$loader->addLibrary('Dummy');
+		$loader->register();
+
+		spl_autoload_register(function($name){ echo 'yey'; return true; });
+
+		ob_start();
+		spl_autoload_call('Foo\\Bar');
+		$this->assertEquals('yey', ob_get_clean());
+	} // end testSkippingUnknownClasses();
 } // end GenericLoaderTest;

@@ -13,6 +13,8 @@ use RecursiveDirectoryIterator;
 use Opl\Autoloader\PHARLoader;
 use Opl\Autoloader\ClassMapBuilder;
 require_once('PHPUnit/Framework/Error.php');
+require_once('PHPUnit/Framework/Constraint/IsEqual.php');
+require_once('PHPUnit/Runner/BaseTestRunner.php');
 
 /**
  * @covers \Opl\Autoloader\PHARLoader
@@ -80,7 +82,7 @@ __HALT_COMPILER();');
 		spl_autoload_register(function($name){ echo 'yey'; return true; });
 
 		ob_start();
-		spl_autoload_call('Foo\\Bar');
+		spl_autoload_call('\\Foo\\Bar');
 		$this->assertEquals('yey', ob_get_clean());
 	} // end testSkippingUnknownClasses();
 } // end PHARLoaderTest;

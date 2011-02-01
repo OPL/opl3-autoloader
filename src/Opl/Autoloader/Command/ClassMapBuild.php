@@ -57,6 +57,7 @@ the class maps for the ClassMapLoader autoloader. The configuration is given as
 an INI file, where each entry represents a single top-level namespace and a path to its code:
 
   [config]
+  outputFile = "./data/classMap.txt"
   extension = "./php"
   
   [namespaces]

@@ -169,10 +169,11 @@ class ClassMapBuilder
 						break;
 				}
 			}
-			if($state == 0)
+			if($className != '' && $state == 0)
 			{
 				break;
 			}
+			$state = 0;
 			$namespace = '';
 			$className = '';
 		}

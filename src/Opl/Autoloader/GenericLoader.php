@@ -58,7 +58,8 @@ class GenericLoader
 	{
 		$this->_namespaceSeparator = $namespaceSeparator;
 
-		if($defaultPath[strlen($defaultPath) - 1] != '/')
+		$length = strlen($defaultPath);
+		if($length == 0 || $defaultPath[$length - 1] != '/')
 		{
 			$defaultPath .= '/';
 		}
@@ -80,7 +81,8 @@ class GenericLoader
 		}
 		if($path !== null)
 		{
-			if($path[strlen($path) - 1] != '/')
+			$length = strlen($path);
+			if($length == 0 || $path[$length - 1] != '/')
 			{
 				$path .= '/';
 			}

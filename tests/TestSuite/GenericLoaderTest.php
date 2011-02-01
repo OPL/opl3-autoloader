@@ -18,7 +18,7 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 {
 	public function testLoaderInitialization()
 	{
-		$loader = new GenericLoader('foo', './foo/bar/');
+		$loader = new GenericLoader('./foo/bar/', 'foo');
 		$this->assertEquals('foo', $loader->getNamespaceSeparator());
 		$this->assertEquals('./foo/bar/', $loader->getDefaultPath());
 	} // end testLoaderInitialization();
@@ -28,7 +28,7 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testConstructorAppendsSlash()
 	{
-		$loader = new GenericLoader('foo', './foo/bar');
+		$loader = new GenericLoader('./foo/bar', 'foo');
 		$this->assertEquals('./foo/bar/', $loader->getDefaultPath());
 	} // end testConstructorAppendsSlash();
 
@@ -37,13 +37,13 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testConstructorAppendsSlashToEmptyString()
 	{
-		$loader = new GenericLoader('foo', '');
+		$loader = new GenericLoader('', 'foo');
 		$this->assertEquals('/', $loader->getDefaultPath());
 	} // end testConstructorAppendsSlash();
 
 	public function testSetDefaultPath()
 	{
-		$loader = new GenericLoader('foo', './foo/bar/');
+		$loader = new GenericLoader('./foo/bar/', 'foo');
 		$this->assertEquals('./foo/bar/', $loader->getDefaultPath());
 
 		$loader->setDefaultPath('./bar/joe/');
@@ -55,14 +55,14 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testSetDefaultPathAppendsSlash()
 	{
-		$loader = new GenericLoader('foo', './foo/bar/');
+		$loader = new GenericLoader('./foo/bar/', 'foo');
 		$loader->setDefaultPath('./bar/joe');
 		$this->assertEquals('./bar/joe/', $loader->getDefaultPath());
 	} // end testSetDefaultPathAppendsSlash();
 
 	public function testSetNamespaceSeparator()
 	{
-		$loader = new GenericLoader('foo', './foo/bar/');
+		$loader = new GenericLoader('./foo/bar/', 'foo');
 		$this->assertEquals('foo', $loader->getNamespaceSeparator());
 		$loader->setNamespaceSeparator('bar');
 		$this->assertEquals('bar', $loader->getNamespaceSeparator());
@@ -70,7 +70,7 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testAddingLibrary()
 	{
-		$loader = new GenericLoader('\\', './foo/bar/');
+		$loader = new GenericLoader('./foo/bar/');
 
 		$this->assertFalse($loader->hasLibrary('Foo'));
 		$this->assertFalse($loader->hasLibrary('Bar'));
@@ -83,7 +83,7 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testAddLibrarySetsDefaultPathAndException()
 	{
-		$loader = new GenericLoader('\\', './foo/bar/');
+		$loader = new GenericLoader('./foo/bar/');
 		$loader->addLibrary('Foo');
 
 		$reflection = new \ReflectionObject($loader);
@@ -98,7 +98,7 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testAddLibrarySetsCustomPathAndException()
 	{
-		$loader = new GenericLoader('\\', './foo/bar/');
+		$loader = new GenericLoader('./foo/bar/');
 		$loader->addLibrary('Foo', './bar/joe/', '.php5');
 
 		$reflection = new \ReflectionObject($loader);
@@ -116,7 +116,7 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testAddLibraryThrowsExceptionWhenLibraryExists()
 	{
-		$loader = new GenericLoader('\\', './foo/bar/');
+		$loader = new GenericLoader('./foo/bar/');
 		$loader->addLibrary('Foo');
 		$this->assertTrue($loader->hasLibrary('Foo'));
 		$loader->addLibrary('Foo');
@@ -124,7 +124,7 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testRemoveLibrary()
 	{
-		$loader = new GenericLoader('\\', './foo/bar/');
+		$loader = new GenericLoader('./foo/bar/');
 		$loader->addLibrary('Foo');
 		$this->assertTrue($loader->hasLibrary('Foo'));
 
@@ -150,14 +150,14 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testRemoveLibraryThrowsExceptionWhenLibraryDoesNotExist()
 	{
-		$loader = new GenericLoader('\\', './foo/bar/');
+		$loader = new GenericLoader('./foo/bar/');
 		$this->assertFalse($loader->hasLibrary('Moo'));
 		$loader->removeLibrary('Moo');
 	} // end testRemoveLibraryThrowsExceptionWhenLibraryDoesNotExist();
 
 	public function testRegisterWorks()
 	{
-		$loader = new GenericLoader('\\', './foo/bar/');
+		$loader = new GenericLoader('./foo/bar/');
 		$loader->register();
 
 		$functions = spl_autoload_functions();
@@ -166,7 +166,7 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testUnregisterWorks()
 	{
-		$loader = new GenericLoader('\\', './foo/bar/');
+		$loader = new GenericLoader('./foo/bar/');
 		$loader->register();
 
 		$functions = spl_autoload_functions();
@@ -188,7 +188,7 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 		\vfsStreamWrapper::register();
 		\vfsStreamWrapper::setRoot($topLevelDir);
 
-		$loader = new GenericLoader('\\', \vfsStream::url(''));
+		$loader = new GenericLoader(\vfsStream::url(''));
 		$loader->addLibrary('Foo');
 		$loader->register();
 
@@ -210,7 +210,7 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 		\vfsStreamWrapper::register();
 		\vfsStreamWrapper::setRoot($topLevelDir);
 
-		$loader = new GenericLoader('\\', \vfsStream::url(''));
+		$loader = new GenericLoader(\vfsStream::url(''));
 		$loader->addLibrary('Foo');
 		$loader->register();
 
@@ -232,7 +232,7 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 		\vfsStreamWrapper::register();
 		\vfsStreamWrapper::setRoot($topLevelDir);
 
-		$loader = new GenericLoader('\\', \vfsStream::url(''));
+		$loader = new GenericLoader(\vfsStream::url(''));
 		$loader->addLibrary('Foo');
 		$loader->register();
 
@@ -243,7 +243,7 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testSkippingUnknownLibraries()
 	{
-		$loader = new GenericLoader('\\', './foo/bar/');
+		$loader = new GenericLoader('./foo/bar/');
 		$loader->addLibrary('Dummy');
 		$loader->register();
 

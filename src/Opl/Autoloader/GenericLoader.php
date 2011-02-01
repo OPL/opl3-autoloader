@@ -51,10 +51,10 @@ class GenericLoader
 	/**
 	 * Constructs the autoloader.
 	 *
-	 * @param string $namespaceSeparator The namespace separator used in this autoloader.
 	 * @param string $defaultPath The default library path.
+	 * @param string $namespaceSeparator The namespace separator used in this autoloader.
 	 */
-	public function __construct($namespaceSeparator = '\\', $defaultPath = './')
+	public function __construct($defaultPath = './', $namespaceSeparator = '\\')
 	{
 		$this->_namespaceSeparator = $namespaceSeparator;
 

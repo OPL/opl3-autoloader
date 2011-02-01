@@ -17,7 +17,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 {
 	public function testLoaderInitialization()
 	{
-		$loader = new ClassMapLoader('./data/classMap.txt', './data/');
+		$loader = new ClassMapLoader('./data/', './data/classMap.txt');
 		$this->assertEquals('./data/', $loader->getDefaultPath());
 	} // end testLoaderInitialization();
 
@@ -26,7 +26,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testConstructorAppendsSlash()
 	{
-		$loader = new ClassMapLoader('./data/classMap.txt', './foo/bar');
+		$loader = new ClassMapLoader('./foo/bar', './data/classMap.txt');
 		$this->assertEquals('./foo/bar/', $loader->getDefaultPath());
 	} // end testConstructorAppendsSlash();
 
@@ -35,13 +35,13 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testConstructorAppendsSlashToEmptyString()
 	{
-		$loader = new ClassMapLoader('./data/classMap.txt', '');
+		$loader = new ClassMapLoader('', './data/classMap.txt');
 		$this->assertEquals('/', $loader->getDefaultPath());
 	} // end testConstructorAppendsSlash();
 
 	public function testSetDefaultPath()
 	{
-		$loader = new ClassMapLoader('./data/classMap.txt', './foo/bar/');
+		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
 		$this->assertEquals('./foo/bar/', $loader->getDefaultPath());
 
 		$loader->setDefaultPath('./bar/joe/');
@@ -53,14 +53,14 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testSetDefaultPathAppendsSlash()
 	{
-		$loader = new ClassMapLoader('./data/classMap.txt', './foo/bar/');
+		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
 		$loader->setDefaultPath('./bar/joe');
 		$this->assertEquals('./bar/joe/', $loader->getDefaultPath());
 	} // end testSetDefaultPathAppendsSlash();
 
 	public function testAddingLibrary()
 	{
-		$loader = new ClassMapLoader('./data/classMap.txt', './foo/bar/');
+		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
 
 		$this->assertFalse($loader->hasLibrary('Foo'));
 		$this->assertFalse($loader->hasLibrary('Bar'));
@@ -73,7 +73,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testAddLibrarySetsDefaultPath()
 	{
-		$loader = new ClassMapLoader('./data/classMap.txt', './foo/bar/');
+		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
 		$loader->addLibrary('Foo');
 
 		$reflection = new \ReflectionObject($loader);
@@ -85,7 +85,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testAddLibrarySetsCustomPath()
 	{
-		$loader = new ClassMapLoader('./data/classMap.txt', './foo/bar/');
+		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
 		$loader->addLibrary('Foo', './bar/joe/');
 
 		$reflection = new \ReflectionObject($loader);
@@ -100,7 +100,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testAddLibraryThrowsExceptionWhenLibraryExists()
 	{
-		$loader = new ClassMapLoader('./data/classMap.txt', './foo/bar/');
+		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
 		$loader->addLibrary('Foo');
 		$this->assertTrue($loader->hasLibrary('Foo'));
 		$loader->addLibrary('Foo');
@@ -108,7 +108,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testRemoveLibrary()
 	{
-		$loader = new ClassMapLoader('./data/classMap.txt', './foo/bar/');
+		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
 		$loader->addLibrary('Foo');
 		$this->assertTrue($loader->hasLibrary('Foo'));
 
@@ -130,14 +130,14 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testRemoveLibraryThrowsExceptionWhenLibraryDoesNotExist()
 	{
-		$loader = new ClassMapLoader('./data/classMap.txt', './foo/bar/');
+		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
 		$this->assertFalse($loader->hasLibrary('Moo'));
 		$loader->removeLibrary('Moo');
 	} // end testRemoveLibraryThrowsExceptionWhenLibraryDoesNotExist();
 
 	public function testRegisterWorks()
 	{
-		$loader = new ClassMapLoader('./data/classMap.txt', './foo/bar/');
+		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
 		$loader->register();
 
 		$functions = spl_autoload_functions();
@@ -146,7 +146,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testUnregisterWorks()
 	{
-		$loader = new ClassMapLoader('./data/classMap.txt', './foo/bar/');
+		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
 		$loader->register();
 
 		$functions = spl_autoload_functions();
@@ -160,7 +160,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testLoadingClasses()
 	{
-		$loader = new ClassMapLoader('./data/classMap.txt', './data/');
+		$loader = new ClassMapLoader('./data/', './data/classMap.txt');
 		$loader->addLibrary('Dummy');
 		$loader->register();
 
@@ -170,7 +170,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testSkippingUnknownClasses()
 	{
-		$loader = new ClassMapLoader('./data/classMap.txt', './data/');
+		$loader = new ClassMapLoader('./data/', './data/classMap.txt');
 		$loader->addLibrary('Dummy');
 		$loader->register();
 

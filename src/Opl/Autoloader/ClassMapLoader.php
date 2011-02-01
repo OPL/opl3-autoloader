@@ -54,11 +54,11 @@ class ClassMapLoader
 	 * Creates the class map loader and loads the map into the memory.
 	 * The map must be constructed with the command line interface.
 	 *
-	 * @param string $classMapLocation The class map location on the disk
 	 * @param string $defaultPath The default location path used for newly registered libraries
+	 * @param string $classMapLocation The class map location on the disk
 	 * @param Cache $cache The optional memory cache to be used
 	 */
-	public function __construct($classMapLocation, $defaultPath, Cache $cache = null)
+	public function __construct($defaultPath, $classMapLocation, Cache $cache = null)
 	{
 		$this->setDefaultPath($defaultPath);
 		$this->_classMapLocation = $classMapLocation;

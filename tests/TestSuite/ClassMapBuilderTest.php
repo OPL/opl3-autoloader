@@ -21,7 +21,7 @@ class ClassMapBuilderTest extends \PHPUnit_Framework_TestCase
 
 		$errors = $builder->addLibrary('Dummy', './data/');
 
-		$this->assertEquals(array('Not a valid class file: Invalid.php'), $errors);
+		$this->assertEquals(array('Not a valid class file: ./data/Dummy/Subdirectory/InvalidFile.php'), $errors);
 		$this->assertEquals(array(
 			'Dummy\\ShortFile' => array(0 => 'Dummy', 1 => 'Dummy/ShortFile.php'),
 			'Dummy\\LongFile' => array(0 => 'Dummy', 1 => 'Dummy/LongFile.php'),
@@ -38,7 +38,7 @@ class ClassMapBuilderTest extends \PHPUnit_Framework_TestCase
 
 		$errors = $builder->addLibrary('Dummy', './data');
 
-		$this->assertEquals(array('Not a valid class file: Invalid.php'), $errors);
+		$this->assertEquals(array('Not a valid class file: ./data/Dummy/Subdirectory/InvalidFile.php'), $errors);
 		$this->assertEquals(array(
 			'Dummy\\ShortFile' => array(0 => 'Dummy', 1 => 'Dummy/ShortFile.php'),
 			'Dummy\\LongFile' => array(0 => 'Dummy', 1 => 'Dummy/LongFile.php'),
@@ -56,7 +56,7 @@ class ClassMapBuilderTest extends \PHPUnit_Framework_TestCase
 		$errors = $builder->addLibrary('Dummy', './data/');
 		$errors = $builder->addLibrary('Dummy2', './data/');
 
-		$this->assertEquals(array('Not a valid class file: Invalid.php'), $errors);
+		$this->assertEquals(array(), $errors);
 		$this->assertEquals(array(
 			'Dummy\\ShortFile' => array(0 => 'Dummy2', 1 => 'Dummy2/ShortFile.php'),
 			'Dummy\\LongFile' => array(0 => 'Dummy', 1 => 'Dummy/LongFile.php'),

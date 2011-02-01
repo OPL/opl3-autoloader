@@ -115,7 +115,7 @@ EOF
 		{
 			$this->_processSingleLibrary($output, $name, $path, $extension);
 		}
-		file_put_contents($outputFile, serialize($this->_constructedMap));
+		file_put_contents($outputFile, serialize($this->_builder->getMap()));
 		$output->writeln('<info>Map saved as:</info> '.$outputFile);
 	} // end execute();
 

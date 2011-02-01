@@ -24,9 +24,9 @@ require(DIR_LIB.'Opl/Autoloader/GenericLoader.php');
 use Opl\Autoloader\GenericLoader;
 $loader = new GenericLoader(DIR_LIB);
 // do not add "Opl" and "Symfony" at the end of the paths!
-$loader->addLibrary('TestSuite', './');
-$loader->addLibrary('Opl', '/your/path/here');
-$loader->addLibrary('Symfony', '/your/path/here');
+$loader->addNamespace('TestSuite', './');
+$loader->addNamespace('Opl', '/your/path/here');
+$loader->addNamespace('Symfony', '/your/path/here');
 $loader->register();
 
 /**

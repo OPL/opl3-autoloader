@@ -15,11 +15,11 @@ use Opl\Autoloader\ClassMapBuilder;
  */
 class ClassMapBuilderTest extends \PHPUnit_Framework_TestCase
 {
-	public function testParsingLibrary()
+	public function testParsingNamespace()
 	{
 		$builder = new ClassMapBuilder();
 
-		$errors = $builder->addLibrary('Dummy', './data/');
+		$errors = $builder->addNamespace('Dummy', './data/');
 
 		$this->assertEquals(array('Not a valid class file: ./data/Dummy/Subdirectory/InvalidFile.php'), $errors);
 		$this->assertEquals(array(
@@ -32,11 +32,11 @@ class ClassMapBuilderTest extends \PHPUnit_Framework_TestCase
 		), $builder->getMap());
 	} // end testParsingLibrary();
 
-	public function testAddLibraryAppendsSlashes()
+	public function testAddNamespaceAppendsSlashes()
 	{
 		$builder = new ClassMapBuilder();
 
-		$errors = $builder->addLibrary('Dummy', './data');
+		$errors = $builder->addNamespace('Dummy', './data');
 
 		$this->assertEquals(array('Not a valid class file: ./data/Dummy/Subdirectory/InvalidFile.php'), $errors);
 		$this->assertEquals(array(
@@ -47,14 +47,14 @@ class ClassMapBuilderTest extends \PHPUnit_Framework_TestCase
 			'Dummy\\Subdirectory\\SubdirSupport' => array(0 => 'Dummy', 1 => 'Dummy/Subdirectory/SubdirSupport.php'),
 			'Dummy_Subdirectory_NoNamespace' => array(0 => 'Dummy', 1 => 'Dummy/Subdirectory/NoNamespace.php'),
 		), $builder->getMap());
-	} // end testAddLibraryAppendsSlashes();
+	} // end testAddNamespaceAppendsSlashes();
 
-	public function testAddLibraryOverwritesOldEntries()
+	public function testAddNamespaceOverwritesOldEntries()
 	{
 		$builder = new ClassMapBuilder();
 
-		$errors = $builder->addLibrary('Dummy', './data/');
-		$errors = $builder->addLibrary('Dummy2', './data/');
+		$errors = $builder->addNamespace('Dummy', './data/');
+		$errors = $builder->addNamespace('Dummy2', './data/');
 
 		$this->assertEquals(array(), $errors);
 		$this->assertEquals(array(
@@ -65,5 +65,5 @@ class ClassMapBuilderTest extends \PHPUnit_Framework_TestCase
 			'Dummy\\Subdirectory\\SubdirSupport' => array(0 => 'Dummy', 1 => 'Dummy/Subdirectory/SubdirSupport.php'),
 			'Dummy_Subdirectory_NoNamespace' => array(0 => 'Dummy', 1 => 'Dummy/Subdirectory/NoNamespace.php'),
 		), $builder->getMap());
-	} // end testAddLibraryOverwritesOldEntries();
+	} // end testAddNamespaceOverwritesOldEntries();
 } // end ClassMapBuilderTest;

@@ -31,13 +31,13 @@ class GenericLoader
 	private $_defaultPath = '';
 
 	/**
-	 * The list of available libraries.
+	 * The list of available top-level namespaces.
 	 * @var array
 	 */
-	private $_libraries = array();
+	private $_namespaces = array();
 
 	/**
-	 * The library extensions.
+	 * The file extensions in the namespaces.
 	 * @var array
 	 */
 	private $_extensions = array();
@@ -51,10 +51,10 @@ class GenericLoader
 	/**
 	 * Constructs the autoloader.
 	 *
+	 * @param string $defaultPath The default namespace path.
 	 * @param string $namespaceSeparator The namespace separator used in this autoloader.
-	 * @param string $defaultPath The default library path.
 	 */
-	public function __construct($namespaceSeparator = '\\', $defaultPath = './')
+	public function __construct($defaultPath = './', $namespaceSeparator = '\\')
 	{
 		$this->_namespaceSeparator = $namespaceSeparator;
 
@@ -67,17 +67,17 @@ class GenericLoader
 	} // end __construct();
 
 	/**
-	 * Registers a new library to match.
+	 * Registers a new top-level namespace to match.
 	 *
-	 * @param string $library The library name to add.
-	 * @param string $path The path to the library.
-	 * @param string $extension The library file extension.
+	 * @param string $namespace The namespace name to add.
+	 * @param string $path The path to the namespace (without the namespace name itself).
+	 * @param string $extension The namespace file extension.
 	 */
-	public function addLibrary($library, $path = null, $extension = '.php')
+	public function addNamespace($namespace, $path = null, $extension = '.php')
 	{
-		if(isset($this->_libraries[(string)$library]))
+		if(isset($this->_namespaces[(string)$namespace]))
 		{
-			throw new RuntimeException('Library '.$library.' is already added.');
+			throw new RuntimeException('The namespace '.$namespace.' is already added.');
 		}
 		if($path !== null)
 		{
@@ -86,39 +86,39 @@ class GenericLoader
 			{
 				$path .= '/';
 			}
-			$this->_libraries[(string)$library] = $path;
+			$this->_namespaces[(string)$namespace] = $path;
 		}
 		else
 		{
-			$this->_libraries[(string)$library] = $this->_defaultPath;
+			$this->_namespaces[(string)$namespace] = $this->_defaultPath;
 		}
-		$this->_extensions[(string)$library] = $extension;
-	} // end addLibrary();
+		$this->_extensions[(string)$namespace] = $extension;
+	} // end addNamespace();
 
 	/**
-	 * Checks if the specified library is available.
+	 * Checks if the specified top-level namespace is available.
 	 *
-	 * @param string $library The library name to check.
+	 * @param string $namespace The namespace name to check.
 	 */
-	public function hasLibrary($library)
+	public function hasNamespace($namespace)
 	{
-		return isset($this->_libraries[(string)$library]);
-	} // end hasLibrary();
+		return isset($this->_namespaces[(string)$namespace]);
+	} // end hasNamespace();
 
 	/**
-	 * Removes a recognized library.
+	 * Removes a registered top-level namespace.
 	 *
-	 * @param string $library The library name to remove.
+	 * @param string $namespace The namespace name to remove.
 	 */
-	public function removeLibrary($library)
+	public function removeNamespace($namespace)
 	{
-		if(!isset($this->_libraries[(string)$library]))
+		if(!isset($this->_namespaces[(string)$namespace]))
 		{
-			throw new RuntimeException('Library '.$library.' is not available.');
+			throw new RuntimeException('The namespace '.$namespace.' is not available.');
 		}
-		unset($this->_libraries[(string)$library]);
-		unset($this->_extensions[(string)$library]);
-	} // end removeLibrary();
+		unset($this->_namespaces[(string)$namespace]);
+		unset($this->_extensions[(string)$namespace]);
+	} // end removeNamespace();
 
 	/**
 	 * Sets the namespace separator used by classes in the namespace of this class loader.
@@ -141,8 +141,8 @@ class GenericLoader
 	} // end getNamespaceSeparator();
 
 	/**
-	 * Sets the default path used by the libraries. Note that it does not affect
-	 * the already added libraries.
+	 * Sets the default path used by the namespaces. Note that it does not affect
+	 * the already added namespaces.
 	 *
 	 * @param string $defaultPath The new default path.
 	 */
@@ -156,7 +156,7 @@ class GenericLoader
 	} // end setDefaultPath();
 
 	/**
-	 * Returns the default path used by the libraries.
+	 * Returns the default path used by the namespaces.
 	 *
 	 * @return string The current default path.
 	 */
@@ -192,7 +192,7 @@ class GenericLoader
 		$className = ltrim($className, $this->_namespaceSeparator);
 		$match = strstr($className, $this->_namespaceSeparator, true);
 
-		if(false === $match || !isset($this->_libraries[$match]))
+		if(false === $match || !isset($this->_namespaces[$match]))
 		{
 			return false;
 		}
@@ -201,7 +201,7 @@ class GenericLoader
 			str_replace($this->_namespaceSeparator, '/', substr($className, 0, strlen($className) - strlen($rest))).
 			str_replace(array('_', $this->_namespaceSeparator), '/', $rest);
 
-		require($this->_libraries[$match].$replacement.$this->_extensions[$match]);
+		require($this->_namespaces[$match].$replacement.$this->_extensions[$match]);
 		return true;
 	} // end loadClass();
 } // end GenericLoader;

@@ -10,11 +10,8 @@
  * and other contributors. See website for details.
  */
 namespace Opl\Autoloader;
-use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use RecursiveRegexIterator;
-use RegexIterator;
 
 /**
  * This utility can produce class maps for PHARLoader and ClassMapLoader.

@@ -10,11 +10,6 @@
  * and other contributors. See website for details.
  */
 namespace Opl\Autoloader\Command;
-use FilesystemIterator;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use RecursiveRegexIterator;
-use RegexIterator;
 use Opl\Autoloader\ClassMapBuilder;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -132,7 +127,7 @@ EOF
 
 		foreach($errors as $error)
 		{
-			$output->writeln(preg_replace('/^(([^\:]+)\:) (.*)$/', '<error>$1</error> $2', $error));
+			$output->writeln(preg_replace('/^(([^\:]+)\:) (.*)$/', '<error>$1</error> $3', $error));
 		}
 	} // end _processSingleNamespace();
 } // end ClassMapBuild;

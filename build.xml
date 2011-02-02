@@ -30,9 +30,17 @@
 	<target name="build" depends="prepare">
 		<echo msg="Copying files" />
 
-		<copy todir="${project.directory.build}/lib">
-			<fileset dir="./lib">
+		<copy todir="${project.directory.build}/src">
+			<fileset dir="./src">
 				<include name="**/*.php" />
+			</fileset>
+		</copy>
+		<copy todir="${project.directory.build}/tests">
+			<fileset dir="./tests">
+				<include name="**" />
+				<exclude name="bootstrap.php" />
+				<exclude name="cache/**" />
+				<exclude name="coverage/**" />
 			</fileset>
 		</copy>
 		<copy file="LICENSE" tofile="${project.directory.build}/LICENSE" overwrite="true"/>
@@ -58,7 +66,7 @@
 			</fileset>
 		</zip>
 		<pharpackage destfile="${project.directory.output}/${project.filename}.phar" basedir="./" signature="sha1">
-			<fileset dir="${project.directory.build}/lib/">
+			<fileset dir="${project.directory.build}/src/">
 				<include name="**" />
 			</fileset>
 			<metadata>
@@ -103,7 +111,7 @@
 				</replacetokens>
 			</filterchain>
 		</copy>
-		<tar destfile="${project.directory.output}/${pear.name}-${project.version}.tar.gz" compression="gzip">
+		<tar destfile="${project.directory.output}/${pear.name}-${project.version}.tgz" compression="gzip">
 			<fileset dir="${project.directory.build}">
 				<include name="**" />
 			</fileset>

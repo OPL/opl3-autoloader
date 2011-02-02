@@ -1,5 +1,5 @@
-Open Power Autoloader 3.0
-=========================
+Open Power Autoloader 3.0-dev
+=============================
 
 This is a collection of universal class loaders for PHP 5.3+ compatible with
 [PSR-0](http://groups.google.com/group/php-standards/web/psr-0-final-proposal) class
@@ -9,7 +9,7 @@ naming rules.
 Version information
 -------------------
 
-This is a development version of Open Power Autoloader 3.0.
+This is a development version of Open Power Autoloader 3.0
 
 Requirements
 ------------
@@ -35,6 +35,8 @@ Extra classes:
 * `\Opl\Autoloader\ClassMapBuilder` - class map builder for the map-based autoloaders.
 * `\Opl\Autoloader\Command\ClassMapBuild` - Symfony 2 Console command that builds
   the class maps for the map-based autoloaders.
+
+Documentation can be found [here](http://static.invenzzia.org/docs/opl/3_0/book/en/autoloader.html).
 
 License and authors
 -------------------

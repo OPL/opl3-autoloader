@@ -1,7 +1,7 @@
 # Configure the project definitions here
 project.name=Open Power Libs
 project.filename=opl
-project.version=3.0-devel
+project.version=3.0.1.0
 project.stability.release=devel
 project.stability.api=devel
 project.license=New BSD

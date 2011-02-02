@@ -127,7 +127,7 @@ EOF
 
 		foreach($errors as $error)
 		{
-			$output->writeln(preg_replace('/^(([^\:]+)\:) (.*)$/', '<error>$1</error> $2', $error));
+			$output->writeln(preg_replace('/^(([^\:]+)\:) (.*)$/', '<error>$1</error> $3', $error));
 		}
 	} // end _processSingleNamespace();
 } // end ClassMapBuild;

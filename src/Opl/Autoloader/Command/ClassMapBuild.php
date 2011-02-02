@@ -10,11 +10,6 @@
  * and other contributors. See website for details.
  */
 namespace Opl\Autoloader\Command;
-use FilesystemIterator;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use RecursiveRegexIterator;
-use RegexIterator;
 use Opl\Autoloader\ClassMapBuilder;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;

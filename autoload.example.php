@@ -18,8 +18,8 @@ $loader = new GenericLoader('./src/');
 
 // Please provide here the correct path to the Symfony as
 // a secondary argument, if different than the default one.
-$loader->addLibrary('Opl');
+$loader->addNamespace('Opl');
 // Please provide here the correct path to the Symfony as
 // a secondary argument, if different than the default one.
-$loader->addLibrary('Symfony');
+$loader->addNamespace('Symfony');
 $loader->register();

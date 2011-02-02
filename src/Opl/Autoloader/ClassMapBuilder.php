@@ -10,6 +10,8 @@
  * and other contributors. See website for details.
  */
 namespace Opl\Autoloader;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 /**
  * This utility can produce class maps for PHARLoader and ClassMapLoader.
@@ -29,7 +31,7 @@ class ClassMapBuilder
 	/**
 	 * Returns the current map structure as an associative array. Each entry
 	 * is identified by the class name and consists of two entries. The first
-	 * one, with index `0` contains the library name; the second one - the
+	 * one, with index `0` contains the top-level namespace name; the second one - the
 	 * relative path.
 	 * 
 	 * @return array
@@ -48,27 +50,32 @@ class ClassMapBuilder
 	} // end clearMap();
 
 	/**
-	 * Adds the specified library to the map. Returns the list of encountered
+	 * Adds the specified top-level namespace to the map. Returns the list of encountered
 	 * errors. If the class is already defined in the map, it is overwritten.
 	 * 
-	 * @param string $libraryName The library name and the name of the top-level directory.
-	 * @param string $path The path to the library directory.
+	 * @param string $namespaceName The namespace name and the name of the top-level directory.
+	 * @param string $path The path to the namespace directory.
 	 * @param string $extension PHP file extension.
 	 * @return array
 	 */
-	public function addLibrary($libraryName, $path, $extension = '.php')
+	public function addNamespace($namespaceName, $path, $extension = '.php')
 	{
+		if($path[strlen($path) - 1] != '/')
+		{
+			$path .= '/';
+		}
+
 		$iterator = new RecursiveIteratorIterator(
-				new RecursiveDirectoryIterator($path.$libraryName)
+				new RecursiveDirectoryIterator($path.$namespaceName)
 			);
 		$errors = array();
 		foreach($iterator as $name => $fileEntry)
 		{
-			if(!preg_match('/^.+\.'.$extension.'$/i', $name))
+			
+			if(!preg_match('/'.str_replace('.', '\\.', $extension).'$/i', $name))
 			{
 				continue;
 			}
-
 			$file = fopen($fileEntry->getPathname(), 'r');
 			if(!is_resource($file))
 			{
@@ -84,12 +91,12 @@ class ClassMapBuilder
 			}
 			else
 			{
-				$this->map[$className] = array(0 => $libraryName, str_replace($path, '', $fileEntry->getPathname()));
+				$this->map[$className] = array(0 => $namespaceName, str_replace($path, '', $fileEntry->getPathname()));
 			}
 		}
 
 		return $errors;
-	} // end addLibrary();
+	} // end addNamespace();
 
 	/**
 	 * Processes a single PHP file, attempting to load the class name
@@ -159,10 +166,11 @@ class ClassMapBuilder
 						break;
 				}
 			}
-			if($state == 0)
+			if($className != '' && $state == 0)
 			{
 				break;
 			}
+			$state = 0;
 			$namespace = '';
 			$className = '';
 		}

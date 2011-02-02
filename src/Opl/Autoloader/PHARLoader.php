@@ -78,7 +78,7 @@ class PHARLoader
 		{
 			return false;
 		}
-		require('phar://'.$this->_classMap[$className][1]);
+		require('phar://'.__FILE__.'/'.$this->_classMap[$className][1]);
 		return true;
 	} // end loadClass();
 } // end PHARLoader;

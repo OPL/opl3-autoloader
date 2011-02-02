@@ -32,10 +32,10 @@ class ClassMapLoader
 	private $_defaultPath = '';
 
 	/**
-	 * The list of available libraries.
+	 * The list of available top-level namespaces.
 	 * @var array
 	 */
-	private $_libraries = array();
+	private $_namespaces = array();
 	/**
 	 * The loaded class map.
 	 * @var array
@@ -54,11 +54,11 @@ class ClassMapLoader
 	 * Creates the class map loader and loads the map into the memory.
 	 * The map must be constructed with the command line interface.
 	 *
+	 * @param string $defaultPath The default location path used for newly registered namespaces
 	 * @param string $classMapLocation The class map location on the disk
-	 * @param string $defaultPath The default location path used for newly registered libraries
 	 * @param Cache $cache The optional memory cache to be used
 	 */
-	public function __construct($classMapLocation, $defaultPath, Cache $cache = null)
+	public function __construct($defaultPath, $classMapLocation, Cache $cache = null)
 	{
 		$this->setDefaultPath($defaultPath);
 		$this->_classMapLocation = $classMapLocation;
@@ -99,66 +99,69 @@ class ClassMapLoader
 	} // end _loadMap();
 
 	/**
-	 * Registers a new library to match.
+	 * Registers a new top-level namespace to match. If no path is specified, the current
+	 * default path is taken.
 	 *
 	 * @throws RuntimeException
-	 * @param string $library The library name to add.
-	 * @param string $path The path to the library.
+	 * @param string $namespace The namespace name to add.
+	 * @param string $path The path to the namespace.
 	 */
-	public function addLibrary($library, $path = null)
+	public function addNamespace($namespace, $path = null)
 	{
-		if(isset($this->_libraries[(string)$library]))
+		if(isset($this->_namespaces[(string)$namespace]))
 		{
-			throw new RuntimeException('The library '.$library.' is already added.');
+			throw new RuntimeException('The namespace '.$namespace.' is already added.');
 		}
 		if($path !== null)
 		{
-			if($path[strlen($path) - 1] != '/')
+			$length = strlen($path);
+			if($length == 0 || $path[$length - 1] != '/')
 			{
 				$path .= '/';
 			}
-			$this->_libraries[(string)$library] = $path;
+			$this->_namespaces[(string)$namespace] = $path;
 		}
 		else
 		{
-			$this->_libraries[(string)$library] = $this->_defaultPath;
+			$this->_namespaces[(string)$namespace] = $this->_defaultPath;
 		}
-	} // end addLibrary();
+	} // end addNamespace();
 
 	/**
-	 * Checks if the specified library is available.
+	 * Checks if the specified namespace is available.
 	 *
-	 * @param string $library The library name to check.
+	 * @param string $namespace The namespace name to check.
 	 */
-	public function hasLibrary($library)
+	public function hasNamespace($namespace)
 	{
-		return isset($this->_libraries[(string)$library]);
-	} // end hasLibrary();
+		return isset($this->_namespaces[(string)$namespace]);
+	} // end hasNamespace();
 
 	/**
-	 * Removes a recognized library.
+	 * Removes a registered top-level namespace.
 	 *
 	 * @throws RuntimeException
-	 * @param string $library The library name to remove.
+	 * @param string $namespace The namespace name to remove.
 	 */
-	public function removeLibrary($library)
+	public function removeNamespace($namespace)
 	{
-		if(!isset($this->_libraries[(string)$library]))
+		if(!isset($this->_namespaces[(string)$namespace]))
 		{
-			throw new RuntimeException('The library '.$library.' is not available.');
+			throw new RuntimeException('The namespace '.$namespace.' is not available.');
 		}
-		unset($this->_libraries[(string)$library]);
-	} // end removeLibrary();
+		unset($this->_namespaces[(string)$namespace]);
+	} // end removeNamespace();
 
 	/**
-	 * Sets the default path used by the libraries. Note that it does not affect
-	 * the already added libraries.
+	 * Sets the default path used by the namespaces. Note that it does not affect
+	 * the already added namespaces.
 	 *
 	 * @param string $defaultPath The new default path.
 	 */
 	public function setDefaultPath($defaultPath)
 	{
-		if($defaultPath[strlen($defaultPath) - 1] != '/')
+		$length = strlen($defaultPath);
+		if($length == 0 || $defaultPath[$length - 1] != '/')
 		{
 			$defaultPath .= '/';
 		}
@@ -166,7 +169,7 @@ class ClassMapLoader
 	} // end setDefaultPath();
 
 	/**
-	 * Returns the default path used by the libraries.
+	 * Returns the default path used by the namespaces.
 	 *
 	 * @return string The current default path.
 	 */
@@ -213,7 +216,7 @@ class ClassMapLoader
 		{
 			return false;
 		}
-		require($this->_libraries[$this->_classMap[$className][0]].$this->_classMap[$className][1]);
+		require($this->_namespaces[$this->_classMap[$className][0]].$this->_classMap[$className][1]);
 		return true;
 	} // end loadClass();
 } // end ClassMapLoader;

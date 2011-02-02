@@ -1,7 +1,7 @@
 # Configure the project definitions here
-project.name=Open Power Libs
-project.filename=opl
-project.version=3.0-devel
+project.name=Open Power Autoloader
+project.filename=opl-autoloader
+project.version=3.0.1.0
 project.stability.release=devel
 project.stability.api=devel
 project.license=New BSD
@@ -26,7 +26,7 @@ remote.path.phar=/path/to/download
 
 # PEAR
 
-pear.name=Opl_Autoloader
+pear.name=OPL_Autoloader
 pear.classdir=Opl/Autoloader
 pear.summary=OPL 3.0 autoloader collection
 pear.description=A collection of universal class autoloaders compatible with PSR-0 class naming convention.

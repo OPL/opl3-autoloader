@@ -111,7 +111,7 @@
 				</replacetokens>
 			</filterchain>
 		</copy>
-		<tar destfile="${project.directory.output}/${pear.name}-${project.version}.tar.gz" compression="gzip">
+		<tar destfile="${project.directory.output}/${pear.name}-${project.version}.tgz" compression="gzip">
 			<fileset dir="${project.directory.build}">
 				<include name="**" />
 			</fileset>

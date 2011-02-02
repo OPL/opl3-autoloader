@@ -26,7 +26,7 @@ remote.path.phar=/path/to/download
 
 # PEAR
 
-pear.name=Opl_Autoloader
+pear.name=OPL_Autoloader
 pear.classdir=Opl/Autoloader
 pear.summary=OPL 3.0 autoloader collection
 pear.description=A collection of universal class autoloaders compatible with PSR-0 class naming convention.

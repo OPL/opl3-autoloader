@@ -41,16 +41,6 @@ class PHARLoader
 	} // end __construct();
 
 	/**
-	 * Returns the current class map location.
-	 *
-	 * @return string
-	 */
-	public function getClassMapLocation()
-	{
-		return $this->_classMapLocation;
-	} // end getClassMapLocation();
-
-	/**
 	 * Installs this class loader on the SPL autoload stack.
 	 */
 	public function register()

@@ -66,4 +66,23 @@ class ClassMapBuilderTest extends \PHPUnit_Framework_TestCase
 			'Dummy_Subdirectory_NoNamespace' => array(0 => 'Dummy', 1 => 'Dummy/Subdirectory/NoNamespace.php'),
 		), $builder->getMap());
 	} // end testAddNamespaceOverwritesOldEntries();
+
+	public function testTraitHandling()
+	{
+		if(version_compare(phpversion(), '5.3.99-dev', '<'))
+		{
+			$this->markTestSkipped('This test requires PHP 5.4 in order to work.');
+		}
+		else
+		{
+			$builder = new ClassMapBuilder();
+
+			$errors = $builder->addNamespace('TraitTest', './data/');
+
+			$this->assertEquals(array(), $errors);
+			$this->assertEquals(array(
+				'TraitTest\\SampleTrait' => array(0 => 'TraitTest', 1 => 'TraitTest/SampleTrait.php'),
+			), $builder->getMap());
+		}
+	} // end testTraitHandling();
 } // end ClassMapBuilderTest;

@@ -1,4 +1,4 @@
-Open Power Autoloader 3.0.1.1
+Open Power Autoloader 3.0.2.x
 =============================
 
 This is a collection of universal class loaders for PHP 5.3+ compatible with
@@ -9,7 +9,7 @@ naming rules.
 Version information
 -------------------
 
-This is a development version of Open Power Autoloader 3.0.1.1
+This is a development version of Open Power Autoloader 3.0.2.x
 
 Requirements
 ------------
@@ -33,8 +33,12 @@ The package provides the following class loaders:
 Extra classes:
 
 * `\Opl\Autoloader\ClassMapBuilder` - class map builder for the map-based autoloaders.
+* `\Opl\Autoloader\CoreTracker` - an autoloader decorator that allows to find the common application
+  core loaded every time.
 * `\Opl\Autoloader\Command\ClassMapBuild` - Symfony 2 Console command that builds
   the class maps for the map-based autoloaders.
+* `\Opl\Autoloader\Command\CoreDump` - Symfony 2 Console command that generates the
+  application core loading code from the `CoreTracker` dump.
 
 Documentation can be found [here](http://static.invenzzia.org/docs/opl/3_0/book/en/autoloader.html).
 

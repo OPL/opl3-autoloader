@@ -18,6 +18,7 @@ class AllTests extends \PHPUnit_Framework_TestSuite
 		$suite->addTestSuite('TestSuite\\GenericLoaderTest');
 		$suite->addTestSuite('TestSuite\\ClassMapLoaderTest');
 		$suite->addTestSuite('TestSuite\\PHARLoaderTest');
+		$suite->addTestSuite('TestSuite\\CoreTrackerTest');
 
 		return $suite;
 	} // end suite();

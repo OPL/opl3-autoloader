@@ -15,5 +15,6 @@ $cli->setCatchExceptions(true);
 
 $cli->addCommands(array(
 	new \Opl\Autoloader\Command\ClassMapBuild(),
+	new \Opl\Autoloader\Command\CoreDump(),
 ));
 $cli->run();

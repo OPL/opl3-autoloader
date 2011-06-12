@@ -1,4 +1,4 @@
-Open Power Autoloader 3.0.2.x
+Open Power Autoloader 3.0.2.0
 =============================
 
 This is a collection of universal class loaders for PHP 5.3+ compatible with
@@ -9,7 +9,7 @@ naming rules.
 Version information
 -------------------
 
-This is a development version of Open Power Autoloader 3.0.2.x
+This is a development version of Open Power Autoloader 3.0.2.0
 
 Requirements
 ------------

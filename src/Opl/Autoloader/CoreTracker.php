@@ -11,7 +11,6 @@
  */
 namespace Opl\Autoloader;
 use DomainException;
-use RuntimeException;
 
 /**
  * This decorator for any OPL autoloader tracks the loaded classes, attempting

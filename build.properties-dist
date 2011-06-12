@@ -1,7 +1,7 @@
 # Configure the project definitions here
 project.name=Open Power Autoloader
 project.filename=opl-autoloader
-project.version=3.0.1.0
+project.version=3.0.2.x
 project.stability.release=devel
 project.stability.api=devel
 project.license=New BSD

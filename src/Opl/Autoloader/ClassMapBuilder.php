@@ -107,6 +107,13 @@ class ClassMapBuilder
 	 */
 	protected function _processSingleFile($file)
 	{
+		// PHP 5.3 does not have this token, so we add it in order not to get
+		// warnings.
+		if(!defined('T_TRAIT'))
+		{
+			define('T_TRAIT', 65536);
+		}
+
 		$code = '';
 		$namespace = '';
 		$className = '';
@@ -135,7 +142,7 @@ class ClassMapBuilder
 
 							$state = 1;
 						}
-						elseif($tokenName == T_CLASS || $tokenName == T_INTERFACE)
+						elseif($tokenName == T_CLASS || $tokenName == T_INTERFACE || $tokenName == T_TRAIT)
 						{
 							$state = 2;
 						}

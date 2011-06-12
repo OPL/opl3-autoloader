@@ -36,9 +36,11 @@ http://pear.php.net/dtd/package-2.0.xsd">
 	<contents>
 		<dir baseinstalldir="/" name="/">
 			<file baseinstalldir="/" name="Opl/Autoloader/Command/ClassMapBuild.php" role="php" />
+			<file baseinstalldir="/" name="Opl/Autoloader/Command/CoreDump.php" role="php" />
 			<file baseinstalldir="/" name="Opl/Autoloader/PHARLoader.php" role="php" />
 			<file baseinstalldir="/" name="Opl/Autoloader/ClassMapLoader.php" role="php" />
 			<file baseinstalldir="/" name="Opl/Autoloader/ClassMapBuilder.php" role="php" />
+			<file baseinstalldir="/" name="Opl/Autoloader/CoreTracker.php" role="php" />
 			<file baseinstalldir="/" name="Opl/Autoloader/GenericLoader.php" role="php" />
 		</dir>
 	</contents>

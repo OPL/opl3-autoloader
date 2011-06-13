@@ -65,7 +65,9 @@ class ClassMapBuilder
 			$path .= '/';
 		}
 
-		$iterator = new RecursiveDirectoryIterator($path.$namespaceName)
+		$iterator = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator($path.$namespaceName)
+			);
 		$errors = array();
 		foreach($iterator as $name => $fileEntry)
 		{

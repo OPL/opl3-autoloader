@@ -11,7 +11,6 @@
  */
 namespace Opl\Autoloader;
 use RuntimeException;
-use Opl\Cache\Cache;
 
 /**
  * This autoloader is based on the pre-computed class location
@@ -56,36 +55,12 @@ class ClassMapLoader
 	 *
 	 * @param string $defaultPath The default location path used for newly registered namespaces
 	 * @param string $classMapLocation The class map location on the disk
-	 * @param Cache $cache The optional memory cache to be used
 	 */
-	public function __construct($defaultPath, $classMapLocation, Cache $cache = null)
+	public function __construct($defaultPath, $classMapLocation)
 	{
 		$this->setDefaultPath($defaultPath);
 		$this->classMapLocation = $classMapLocation;
 
-		if(null !== $cache)
-		{
-			$this->classMap = $cache->get('classMap');
-			if(null === $this->classMap)
-			{
-				$this->_loadMap();
-				$cache->set('classMap', $this->classMap);
-			}
-		}
-		else
-		{
-			$this->_loadMap();
-		}
-	} // end __construct();
-
-	/**
-	 * Loads the map from a file.
-	 *
-	 * @internal
-	 * @throws RuntimeException
-	 */
-	protected function _loadMap()
-	{
 		if(!file_exists($this->classMapLocation))
 		{
 			throw new RuntimeException('Cannot find a class map under the specified location.');
@@ -96,7 +71,7 @@ class ClassMapLoader
 		{
 			throw new RuntimeException('The loaded file does not contain a valid class map.');
 		}
-	} // end _loadMap();
+	} // end __construct();
 
 	/**
 	 * Registers a new top-level namespace to match. If no path is specified, the current

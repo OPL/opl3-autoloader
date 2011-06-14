@@ -26,7 +26,7 @@ class PHARLoader
 	 * @var array
 	 * @internal
 	 */
-	protected $_classMap;
+	protected $classMap;
 
 	/**
 	 * Creates the class map loader and loads the map into the memory.
@@ -37,7 +37,7 @@ class PHARLoader
 	 */
 	public function __construct(array $classMap)
 	{
-		$this->_classMap = $classMap;
+		$this->classMap = $classMap;
 	} // end __construct();
 
 	/**
@@ -64,11 +64,11 @@ class PHARLoader
 	 */
 	public function loadClass($className)
 	{
-		if(!isset($this->_classMap[$className]))
+		if(!isset($this->classMap[$className]))
 		{
 			return false;
 		}
-		require('phar://'.__FILE__.'/'.$this->_classMap[$className][1]);
+		require('phar://'.__FILE__.'/'.$this->classMap[$className][1]);
 		return true;
 	} // end loadClass();
 } // end PHARLoader;

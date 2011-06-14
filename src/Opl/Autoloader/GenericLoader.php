@@ -10,7 +10,7 @@
  * and other contributors. See website for details.
  */
 namespace Opl\Autoloader;
-use RuntimeException;
+use DomainException;
 
 /**
  * The generic class autoloader is a slightly enhanced version of the
@@ -77,7 +77,7 @@ class GenericLoader
 	{
 		if(isset($this->_namespaces[(string)$namespace]))
 		{
-			throw new RuntimeException('The namespace '.$namespace.' is already added.');
+			throw new DomainException('The namespace '.$namespace.' is already added.');
 		}
 		if($path !== null)
 		{
@@ -114,7 +114,7 @@ class GenericLoader
 	{
 		if(!isset($this->_namespaces[(string)$namespace]))
 		{
-			throw new RuntimeException('The namespace '.$namespace.' is not available.');
+			throw new DomainException('The namespace '.$namespace.' is not available.');
 		}
 		unset($this->_namespaces[(string)$namespace]);
 		unset($this->_extensions[(string)$namespace]);

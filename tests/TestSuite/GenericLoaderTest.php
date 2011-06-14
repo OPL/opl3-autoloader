@@ -112,7 +112,7 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 	} // end testAddNamespaceSetsCustomPathAndExtension();
 
 	/**
-	 * @expectedException RuntimeException
+	 * @expectedException DomainException
 	 */
 	public function testAddNamespaceThrowsExceptionWhenNamespaceExists()
 	{
@@ -146,7 +146,7 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * @depends testRemoveNamespace
-	 * @expectedException RuntimeException
+	 * @expectedException DomainException
 	 */
 	public function testRemoveNamespaceThrowsExceptionWhenNamespaceDoesNotExist()
 	{

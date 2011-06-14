@@ -111,6 +111,21 @@ class GenericLoaderTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals(array('Foo' => '.php5'), $extensionsProperty->getValue($loader));
 	} // end testAddNamespaceSetsCustomPathAndExtension();
 
+	public function testAddNamespaceAddsTrailingSlash()
+	{
+		$loader = new GenericLoader('./foo/bar');
+		$loader->addNamespace('Foo', './bar/joe', '.php5');
+		
+		$reflection = new \ReflectionObject($loader);
+		$namespacesProperty = $reflection->getProperty('namespaces');
+		$namespacesProperty->setAccessible(true);
+		$extensionsProperty = $reflection->getProperty('extensions');
+		$extensionsProperty->setAccessible(true);
+
+		$this->assertEquals(array('Foo' => './bar/joe/'), $namespacesProperty->getValue($loader));
+		$this->assertEquals(array('Foo' => '.php5'), $extensionsProperty->getValue($loader));
+	} // end testAddNamespaceAddsTrailingSlash();
+	
 	/**
 	 * @expectedException DomainException
 	 */

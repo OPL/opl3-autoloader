@@ -20,6 +20,14 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 		$loader = new ClassMapLoader('./data/', './data/classMap.txt');
 		$this->assertEquals('./data/', $loader->getDefaultPath());
 	} // end testLoaderInitialization();
+	
+	/**
+	 * @expectedException RuntimeException
+	 */
+	public function testConstructorThrowsExceptionIfFileDoesNotExist()
+	{
+		$loader = new ClassMapLoader('./data/', './data/not_exist.txt');
+	} // end testLoaderInitialization();
 
 	/**
 	 * @depends testLoaderInitialization

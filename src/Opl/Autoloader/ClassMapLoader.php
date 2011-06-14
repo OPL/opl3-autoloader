@@ -29,26 +29,26 @@ class ClassMapLoader
 	 * @static
 	 * @var string
 	 */
-	private $_defaultPath = '';
+	private $defaultPath = '';
 
 	/**
 	 * The list of available top-level namespaces.
 	 * @var array
 	 */
-	private $_namespaces = array();
+	private $namespaces = array();
 	/**
 	 * The loaded class map.
 	 * @var array
 	 * @internal
 	 */
-	protected $_classMap;
+	protected $classMap;
 
 	/**
 	 * The location where the class map is stored.
 	 * @var string
 	 * @internal
 	 */
-	protected $_classMapLocation;
+	protected $classMapLocation;
 
 	/**
 	 * Creates the class map loader and loads the map into the memory.
@@ -61,15 +61,15 @@ class ClassMapLoader
 	public function __construct($defaultPath, $classMapLocation, Cache $cache = null)
 	{
 		$this->setDefaultPath($defaultPath);
-		$this->_classMapLocation = $classMapLocation;
+		$this->classMapLocation = $classMapLocation;
 
 		if(null !== $cache)
 		{
-			$this->_classMap = $cache->get('classMap');
-			if(null === $this->_classMap)
+			$this->classMap = $cache->get('classMap');
+			if(null === $this->classMap)
 			{
 				$this->_loadMap();
-				$cache->set('classMap', $this->_classMap);
+				$cache->set('classMap', $this->classMap);
 			}
 		}
 		else
@@ -86,13 +86,13 @@ class ClassMapLoader
 	 */
 	protected function _loadMap()
 	{
-		if(!file_exists($this->_classMapLocation))
+		if(!file_exists($this->classMapLocation))
 		{
 			throw new RuntimeException('Cannot find a class map under the specified location.');
 		}
-		$this->_classMap = unserialize(file_get_contents($this->_classMapLocation));
+		$this->classMap = unserialize(file_get_contents($this->classMapLocation));
 
-		if(!is_array($this->_classMap))
+		if(!is_array($this->classMap))
 		{
 			throw new RuntimeException('The loaded file does not contain a valid class map.');
 		}
@@ -108,7 +108,7 @@ class ClassMapLoader
 	 */
 	public function addNamespace($namespace, $path = null)
 	{
-		if(isset($this->_namespaces[(string)$namespace]))
+		if(isset($this->namespaces[(string)$namespace]))
 		{
 			throw new RuntimeException('The namespace '.$namespace.' is already added.');
 		}
@@ -119,11 +119,11 @@ class ClassMapLoader
 			{
 				$path .= '/';
 			}
-			$this->_namespaces[(string)$namespace] = $path;
+			$this->namespaces[(string)$namespace] = $path;
 		}
 		else
 		{
-			$this->_namespaces[(string)$namespace] = $this->_defaultPath;
+			$this->namespaces[(string)$namespace] = $this->defaultPath;
 		}
 	} // end addNamespace();
 
@@ -134,7 +134,7 @@ class ClassMapLoader
 	 */
 	public function hasNamespace($namespace)
 	{
-		return isset($this->_namespaces[(string)$namespace]);
+		return isset($this->namespaces[(string)$namespace]);
 	} // end hasNamespace();
 
 	/**
@@ -145,11 +145,11 @@ class ClassMapLoader
 	 */
 	public function removeNamespace($namespace)
 	{
-		if(!isset($this->_namespaces[(string)$namespace]))
+		if(!isset($this->namespaces[(string)$namespace]))
 		{
 			throw new RuntimeException('The namespace '.$namespace.' is not available.');
 		}
-		unset($this->_namespaces[(string)$namespace]);
+		unset($this->namespaces[(string)$namespace]);
 	} // end removeNamespace();
 
 	/**
@@ -165,7 +165,7 @@ class ClassMapLoader
 		{
 			$defaultPath .= '/';
 		}
-		$this->_defaultPath = $defaultPath;
+		$this->defaultPath = $defaultPath;
 	} // end setDefaultPath();
 
 	/**
@@ -175,7 +175,7 @@ class ClassMapLoader
 	 */
 	public function getDefaultPath()
 	{
-		return $this->_defaultPath;
+		return $this->defaultPath;
 	} // end getDefaultPath();
 
 	/**
@@ -185,7 +185,7 @@ class ClassMapLoader
 	 */
 	public function getClassMapLocation()
 	{
-		return $this->_classMapLocation;
+		return $this->classMapLocation;
 	} // end getClassMapLocation();
 
 	/**
@@ -212,11 +212,11 @@ class ClassMapLoader
 	 */
 	public function loadClass($className)
 	{
-		if(!isset($this->_classMap[$className]))
+		if(!isset($this->classMap[$className]))
 		{
 			return false;
 		}
-		require($this->_namespaces[$this->_classMap[$className][0]].$this->_classMap[$className][1]);
+		require($this->namespaces[$this->classMap[$className][0]].$this->classMap[$className][1]);
 		return true;
 	} // end loadClass();
 } // end ClassMapLoader;

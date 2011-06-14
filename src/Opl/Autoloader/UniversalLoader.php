@@ -29,25 +29,25 @@ class UniversalLoader
 	 * @static
 	 * @var string
 	 */
-	private $_defaultPath = '';
+	private $defaultPath = '';
 
 	/**
 	 * The list of available namespaces.
 	 * @var array
 	 */
-	private $_namespaces = array();
+	private $namespaces = array();
 
 	/**
 	 * The file extensions in the namespaces.
 	 * @var array
 	 */
-	private $_extensions = array();
+	private $extensions = array();
 
 	/**
 	 * The namespace separator
 	 * @var string
 	 */
-	private $_namespaceSeparator = '\\';
+	private $namespaceSeparator = '\\';
 
 	/**
 	 * Constructs the autoloader.
@@ -57,14 +57,14 @@ class UniversalLoader
 	 */
 	public function __construct($defaultPath = './', $namespaceSeparator = '\\')
 	{
-		$this->_namespaceSeparator = $namespaceSeparator;
+		$this->namespaceSeparator = $namespaceSeparator;
 
 		$length = strlen($defaultPath);
 		if($length == 0 || $defaultPath[$length - 1] != '/')
 		{
 			$defaultPath .= '/';
 		}
-		$this->_defaultPath = $defaultPath;
+		$this->defaultPath = $defaultPath;
 	} // end __construct();
 
 	/**
@@ -76,7 +76,7 @@ class UniversalLoader
 	 */
 	public function addNamespace($namespace, $path = null, $extension = '.php')
 	{
-		if(isset($this->_namespaces[(string)$namespace]))
+		if(isset($this->namespaces[(string)$namespace]))
 		{
 			throw new DomainException('The namespace '.$namespace.' is already added.');
 		}
@@ -87,13 +87,13 @@ class UniversalLoader
 			{
 				$path .= '/';
 			}
-			$this->_namespaces[(string)$namespace] = $path;
+			$this->namespaces[(string)$namespace] = $path;
 		}
 		else
 		{
-			$this->_namespaces[(string)$namespace] = $this->_defaultPath;
+			$this->namespaces[(string)$namespace] = $this->defaultPath;
 		}
-		$this->_extensions[(string)$namespace] = $extension;
+		$this->extensions[(string)$namespace] = $extension;
 	} // end addNamespace();
 
 	/**
@@ -103,7 +103,7 @@ class UniversalLoader
 	 */
 	public function hasNamespace($namespace)
 	{
-		return isset($this->_namespaces[(string)$namespace]);
+		return isset($this->namespaces[(string)$namespace]);
 	} // end hasNamespace();
 
 	/**
@@ -113,12 +113,12 @@ class UniversalLoader
 	 */
 	public function removeNamespace($namespace)
 	{
-		if(!isset($this->_namespaces[(string)$namespace]))
+		if(!isset($this->namespaces[(string)$namespace]))
 		{
 			throw new DomainException('The namespace '.$namespace.' is not available.');
 		}
-		unset($this->_namespaces[(string)$namespace]);
-		unset($this->_extensions[(string)$namespace]);
+		unset($this->namespaces[(string)$namespace]);
+		unset($this->extensions[(string)$namespace]);
 	} // end removeNamespace();
 
 	/**
@@ -128,7 +128,7 @@ class UniversalLoader
 	 */
 	public function setNamespaceSeparator($sep)
 	{
-		$this->_namespaceSeparator = $sep;
+		$this->namespaceSeparator = $sep;
 	} // end setNamespaceSeparator();
 
 	/**
@@ -138,7 +138,7 @@ class UniversalLoader
 	 */
 	public function getNamespaceSeparator()
 	{
-		return $this->_namespaceSeparator;
+		return $this->namespaceSeparator;
 	} // end getNamespaceSeparator();
 
 	/**
@@ -153,7 +153,7 @@ class UniversalLoader
 		{
 			$defaultPath .= '/';
 		}
-		$this->_defaultPath = $defaultPath;
+		$this->defaultPath = $defaultPath;
 	} // end setDefaultPath();
 
 	/**
@@ -163,7 +163,7 @@ class UniversalLoader
 	 */
 	public function getDefaultPath()
 	{
-		return $this->_defaultPath;
+		return $this->defaultPath;
 	} // end getDefaultPath();
 
 	/**
@@ -190,17 +190,17 @@ class UniversalLoader
 	 */
 	public function loadClass($className)
 	{		
-		$className = ltrim($className, $this->_namespaceSeparator);
+		$className = ltrim($className, $this->namespaceSeparator);
 		
-		foreach($this->_namespaces as $namespace => $path)
+		foreach($this->namespaces as $namespace => $path)
 		{
 			if(0 === strpos($className, $namespace))
 			{
-				$rest = strrchr($className, $this->_namespaceSeparator);
+				$rest = strrchr($className, $this->namespaceSeparator);
 				$replacement =
-					str_replace($this->_namespaceSeparator, '/', substr($className, 0, strlen($className) - strlen($rest))).
-					str_replace(array('_', $this->_namespaceSeparator), '/', $rest);
-				require($path.$replacement.$this->_extensions[$namespace]);
+					str_replace($this->namespaceSeparator, '/', substr($className, 0, strlen($className) - strlen($rest))).
+					str_replace(array('_', $this->namespaceSeparator), '/', $rest);
+				require($path.$replacement.$this->extensions[$namespace]);
 				return true;
 			}
 		}

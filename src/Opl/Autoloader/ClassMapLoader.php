@@ -66,7 +66,7 @@ class ClassMapLoader
 		{
 			throw new RuntimeException('Cannot find a class map under the specified location.');
 		}
-		$this->classMap = unserialize(file_get_contents($this->classMapLocation));
+		$this->classMap = @unserialize(file_get_contents($this->classMapLocation));
 
 		if(!is_array($this->classMap))
 		{

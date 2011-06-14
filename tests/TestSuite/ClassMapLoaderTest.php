@@ -96,7 +96,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	} // end testAddNamespaceSetsCustomPath();
 
 	/**
-	 * @expectedException RuntimeException
+	 * @expectedException DomainException
 	 */
 	public function testAddNamespaceThrowsExceptionWhenNamespaceExists()
 	{
@@ -126,7 +126,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * @depends testRemoveNamespace
-	 * @expectedException RuntimeException
+	 * @expectedException DomainException
 	 */
 	public function testRemoveNamespaceThrowsExceptionWhenNamespaceDoesNotExist()
 	{

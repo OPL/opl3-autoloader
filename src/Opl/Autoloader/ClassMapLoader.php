@@ -10,6 +10,7 @@
  * and other contributors. See website for details.
  */
 namespace Opl\Autoloader;
+use DomainException;
 use RuntimeException;
 
 /**
@@ -85,7 +86,7 @@ class ClassMapLoader
 	{
 		if(isset($this->namespaces[(string)$namespace]))
 		{
-			throw new RuntimeException('The namespace '.$namespace.' is already added.');
+			throw new DomainException('The namespace '.$namespace.' is already added.');
 		}
 		if($path !== null)
 		{
@@ -122,7 +123,7 @@ class ClassMapLoader
 	{
 		if(!isset($this->namespaces[(string)$namespace]))
 		{
-			throw new RuntimeException('The namespace '.$namespace.' is not available.');
+			throw new DomainException('The namespace '.$namespace.' is not available.');
 		}
 		unset($this->namespaces[(string)$namespace]);
 	} // end removeNamespace();

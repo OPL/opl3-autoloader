@@ -10,7 +10,7 @@
  * and other contributors. See website for details.
  */
 namespace Opl\Autoloader;
-use RuntimeException;
+use DomainException;
 
 /**
  * The generic class autoloader is a slightly enhanced version of the
@@ -28,25 +28,25 @@ class GenericLoader
 	 * @static
 	 * @var string
 	 */
-	private $_defaultPath = '';
+	private $defaultPath = '';
 
 	/**
 	 * The list of available top-level namespaces.
 	 * @var array
 	 */
-	private $_namespaces = array();
+	private $namespaces = array();
 
 	/**
 	 * The file extensions in the namespaces.
 	 * @var array
 	 */
-	private $_extensions = array();
+	private $extensions = array();
 
 	/**
 	 * The namespace separator
 	 * @var string
 	 */
-	private $_namespaceSeparator = '\\';
+	private $namespaceSeparator = '\\';
 
 	/**
 	 * Constructs the autoloader.
@@ -56,14 +56,14 @@ class GenericLoader
 	 */
 	public function __construct($defaultPath = './', $namespaceSeparator = '\\')
 	{
-		$this->_namespaceSeparator = $namespaceSeparator;
+		$this->namespaceSeparator = $namespaceSeparator;
 
 		$length = strlen($defaultPath);
 		if($length == 0 || $defaultPath[$length - 1] != '/')
 		{
 			$defaultPath .= '/';
 		}
-		$this->_defaultPath = $defaultPath;
+		$this->defaultPath = $defaultPath;
 	} // end __construct();
 
 	/**
@@ -75,9 +75,9 @@ class GenericLoader
 	 */
 	public function addNamespace($namespace, $path = null, $extension = '.php')
 	{
-		if(isset($this->_namespaces[(string)$namespace]))
+		if(isset($this->namespaces[(string)$namespace]))
 		{
-			throw new RuntimeException('The namespace '.$namespace.' is already added.');
+			throw new DomainException('The namespace '.$namespace.' is already added.');
 		}
 		if($path !== null)
 		{
@@ -86,13 +86,13 @@ class GenericLoader
 			{
 				$path .= '/';
 			}
-			$this->_namespaces[(string)$namespace] = $path;
+			$this->namespaces[(string)$namespace] = $path;
 		}
 		else
 		{
-			$this->_namespaces[(string)$namespace] = $this->_defaultPath;
+			$this->namespaces[(string)$namespace] = $this->defaultPath;
 		}
-		$this->_extensions[(string)$namespace] = $extension;
+		$this->extensions[(string)$namespace] = $extension;
 	} // end addNamespace();
 
 	/**
@@ -102,7 +102,7 @@ class GenericLoader
 	 */
 	public function hasNamespace($namespace)
 	{
-		return isset($this->_namespaces[(string)$namespace]);
+		return isset($this->namespaces[(string)$namespace]);
 	} // end hasNamespace();
 
 	/**
@@ -112,12 +112,12 @@ class GenericLoader
 	 */
 	public function removeNamespace($namespace)
 	{
-		if(!isset($this->_namespaces[(string)$namespace]))
+		if(!isset($this->namespaces[(string)$namespace]))
 		{
-			throw new RuntimeException('The namespace '.$namespace.' is not available.');
+			throw new DomainException('The namespace '.$namespace.' is not available.');
 		}
-		unset($this->_namespaces[(string)$namespace]);
-		unset($this->_extensions[(string)$namespace]);
+		unset($this->namespaces[(string)$namespace]);
+		unset($this->extensions[(string)$namespace]);
 	} // end removeNamespace();
 
 	/**
@@ -127,7 +127,7 @@ class GenericLoader
 	 */
 	public function setNamespaceSeparator($sep)
 	{
-		$this->_namespaceSeparator = $sep;
+		$this->namespaceSeparator = $sep;
 	} // end setNamespaceSeparator();
 
 	/**
@@ -137,7 +137,7 @@ class GenericLoader
 	 */
 	public function getNamespaceSeparator()
 	{
-		return $this->_namespaceSeparator;
+		return $this->namespaceSeparator;
 	} // end getNamespaceSeparator();
 
 	/**
@@ -152,7 +152,7 @@ class GenericLoader
 		{
 			$defaultPath .= '/';
 		}
-		$this->_defaultPath = $defaultPath;
+		$this->defaultPath = $defaultPath;
 	} // end setDefaultPath();
 
 	/**
@@ -162,7 +162,7 @@ class GenericLoader
 	 */
 	public function getDefaultPath()
 	{
-		return $this->_defaultPath;
+		return $this->defaultPath;
 	} // end getDefaultPath();
 
 	/**
@@ -189,19 +189,19 @@ class GenericLoader
 	 */
 	public function loadClass($className)
 	{
-		$className = ltrim($className, $this->_namespaceSeparator);
-		$match = strstr($className, $this->_namespaceSeparator, true);
+		$className = ltrim($className, $this->namespaceSeparator);
+		$match = strstr($className, $this->namespaceSeparator, true);
 
-		if(false === $match || !isset($this->_namespaces[$match]))
+		if(false === $match || !isset($this->namespaces[$match]))
 		{
 			return false;
 		}
-		$rest = strrchr($className, $this->_namespaceSeparator);
+		$rest = strrchr($className, $this->namespaceSeparator);
 		$replacement =
-			str_replace($this->_namespaceSeparator, '/', substr($className, 0, strlen($className) - strlen($rest))).
-			str_replace(array('_', $this->_namespaceSeparator), '/', $rest);
+			str_replace($this->namespaceSeparator, '/', substr($className, 0, strlen($className) - strlen($rest))).
+			str_replace(array('_', $this->namespaceSeparator), '/', $rest);
 
-		require($this->_namespaces[$match].$replacement.$this->_extensions[$match]);
+		require($this->namespaces[$match].$replacement.$this->extensions[$match]);
 		return true;
 	} // end loadClass();
 } // end GenericLoader;

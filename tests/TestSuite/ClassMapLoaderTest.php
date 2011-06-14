@@ -77,7 +77,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 		$loader->addNamespace('Foo');
 
 		$reflection = new \ReflectionObject($loader);
-		$namespacesProperty = $reflection->getProperty('_namespaces');
+		$namespacesProperty = $reflection->getProperty('namespaces');
 		$namespacesProperty->setAccessible(true);
 
 		$this->assertEquals(array('Foo' => './foo/bar/'), $namespacesProperty->getValue($loader));
@@ -89,7 +89,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 		$loader->addNamespace('Foo', './bar/joe/');
 
 		$reflection = new \ReflectionObject($loader);
-		$namespacesProperty = $reflection->getProperty('_namespaces');
+		$namespacesProperty = $reflection->getProperty('namespaces');
 		$namespacesProperty->setAccessible(true);
 
 		$this->assertEquals(array('Foo' => './bar/joe/'), $namespacesProperty->getValue($loader));
@@ -113,7 +113,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($loader->hasNamespace('Foo'));
 
 		$reflection = new \ReflectionObject($loader);
-		$namespacesProperty = $reflection->getProperty('_namespaces');
+		$namespacesProperty = $reflection->getProperty('namespaces');
 		$namespacesProperty->setAccessible(true);
 
 		$this->assertEquals(array('Foo' => './foo/bar/'), $namespacesProperty->getValue($loader));

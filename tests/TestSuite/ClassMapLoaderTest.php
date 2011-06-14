@@ -30,6 +30,20 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	} // end testLoaderInitialization();
 
 	/**
+	 * @expectedException RuntimeException
+	 */
+	public function testConstructorThrowsExceptionIfMapIsInvalid()
+	{
+		$loader = new ClassMapLoader('./data/', './data/invalid_map.txt');
+	} // end testLoaderInitialization();
+	
+	public function testGetClassMapLocationReturnsTheRequestedData()
+	{
+		$loader = new ClassMapLoader('./data/', './data/classMap.txt');
+		$this->assertEquals('./data/classMap.txt', $loader->getClassMapLocation());
+	} // end testGetClassMapLocationReturnsTheRequestedData();
+	
+	/**
 	 * @depends testLoaderInitialization
 	 */
 	public function testConstructorAppendsSlash()
@@ -102,6 +116,18 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 		$this->assertEquals(array('Foo' => './bar/joe/'), $namespacesProperty->getValue($loader));
 	} // end testAddNamespaceSetsCustomPath();
+	
+	public function testAddNamespaceAddsTrailingSlash()
+	{
+		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader->addNamespace('Foo', './bar/joe');
+		
+		$reflection = new \ReflectionObject($loader);
+		$namespacesProperty = $reflection->getProperty('namespaces');
+		$namespacesProperty->setAccessible(true);
+
+		$this->assertEquals(array('Foo' => './bar/joe/'), $namespacesProperty->getValue($loader));
+	} // end testAddNamespaceAddsTrailingSlash();
 
 	/**
 	 * @expectedException DomainException

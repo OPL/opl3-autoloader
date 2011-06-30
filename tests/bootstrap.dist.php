@@ -25,6 +25,7 @@ use Opl\Autoloader\GenericLoader;
 $loader = new GenericLoader(DIR_LIB);
 // do not add "Opl" and "Symfony" at the end of the paths!
 $loader->addNamespace('TestSuite', './');
+$loader->addNamespace('Extra', './');
 $loader->addNamespace('Opl', '/your/path/here');
 $loader->addNamespace('Symfony', '/your/path/here');
 $loader->register();
@@ -38,6 +39,7 @@ use Opl\Autoloader\ClassMapLoader;
 $loader = new ClassMapLoader('/path/to/the/classmap', DIR_LIB);
 // do not add "Opl" and "Symfony" at the end of the paths!
 $loader->addNamespace('TestSuite', './');
+$loader->addNamespace('Extra', './');
 $loader->addNamespace('Opl', '/your/path/here');
 $loader->addNamespace('Symfony', '/your/path/here');
 $loader->register();

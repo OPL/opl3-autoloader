@@ -10,7 +10,7 @@ namespace TestSuite\Toolset;
 use Opl\Autoloader\Toolset\ClassMapBuilder;
 
 /**
- * @covers \Opl\Autoloader\ClassMapBuilder
+ * @covers \Opl\Autoloader\Toolset\ClassMapBuilder
  * @runTestsInSeparateProcesses
  */
 class ClassMapBuilderTest extends \PHPUnit_Framework_TestCase

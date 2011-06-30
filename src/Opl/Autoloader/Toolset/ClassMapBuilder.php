@@ -9,7 +9,7 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Opl\Autoloader;
+namespace Opl\Autoloader\Toolset;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
@@ -20,7 +20,7 @@ use RecursiveIteratorIterator;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class ClassMapBuilder
+class ClassMapBuilder extends AbstractTool
 {
 	/**
 	 * The generated map.
@@ -48,22 +48,37 @@ class ClassMapBuilder
 	{
 		$this->map = array();
 	} // end clearMap();
+	
+	/**
+	 * Constructs the map from the registered namespaces.
+	 * 
+	 * @return array The list of errors.
+	 */
+	public function buildMap()
+	{
+		$errors = array();
+		foreach($this->namespaces as $namespace => $void)
+		{
+			$nsErrors = $this->processNamespace($namespace);
+			foreach($nsErrors as $error)
+			{
+				$errors[] = $error;
+			}
+		}
+		return $errors;
+	} // end buildMap();
 
 	/**
-	 * Adds the specified top-level namespace to the map. Returns the list of encountered
+	 * Processes the specified top-level namespace to the map. Returns the list of encountered
 	 * errors. If the class is already defined in the map, it is overwritten.
 	 * 
 	 * @param string $namespaceName The namespace name and the name of the top-level directory.
-	 * @param string $path The path to the namespace directory.
-	 * @param string $extension PHP file extension.
 	 * @return array
 	 */
-	public function addNamespace($namespaceName, $path, $extension = '.php')
+	protected function processNamespace($namespaceName)
 	{
-		if($path[strlen($path) - 1] != '/')
-		{
-			$path .= '/';
-		}
+		$path = $this->namespaces[$namespaceName];
+		$extension = $this->extensions[$namespaceName];
 
 		$iterator = new RecursiveIteratorIterator(
 				new RecursiveDirectoryIterator($path.$namespaceName)
@@ -97,6 +112,8 @@ class ClassMapBuilder
 
 		return $errors;
 	} // end addNamespace();
+	
+	
 
 	/**
 	 * Processes a single PHP file, attempting to load the class name

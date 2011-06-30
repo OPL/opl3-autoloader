@@ -109,25 +109,15 @@ EOF
 		$this->_builder = new ClassMapBuilder();
 		foreach($data['namespaces'] as $name => $path)
 		{
-			$this->_processSingleNamespace($output, $name, $path, $extension);
+			$this->_builder->addNamespace($name, $path, $extension);
 		}
-		file_put_contents($outputFile, serialize($this->_builder->getMap()));
-		$output->writeln('<info>Map saved as:</info> '.$outputFile);
-	} // end execute();
-
-	/**
-	 * Processes a single top-level namespace.
-	 *
-	 * @param string $name
-	 * @param string $path
-	 */
-	protected function _processSingleNamespace(OutputInterface $output, $namespaceName, $path, $extension)
-	{
-		$errors = $this->_builder->addNamespace($namespaceName, $path, $extension);
-
+		$errors = $this->_builder->buildMap();
 		foreach($errors as $error)
 		{
 			$output->writeln(preg_replace('/^(([^\:]+)\:) (.*)$/', '<error>$1</error> $3', $error));
 		}
-	} // end _processSingleNamespace();
+		
+		file_put_contents($outputFile, serialize($this->_builder->getMap()));
+		$output->writeln('<info>Map saved as:</info> '.$outputFile);
+	} // end execute();
 } // end ClassMapBuild;

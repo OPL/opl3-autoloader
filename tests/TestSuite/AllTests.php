@@ -14,12 +14,13 @@ class AllTests extends \PHPUnit_Framework_TestSuite
 	{
 		$suite = new AllTests('TestSuite');
 
-		$suite->addTestSuite('TestSuite\\ClassMapBuilderTest');
 		$suite->addTestSuite('TestSuite\\GenericLoaderTest');
 		$suite->addTestSuite('TestSuite\\ClassMapLoaderTest');
 		$suite->addTestSuite('TestSuite\\PHARLoaderTest');
 		$suite->addTestSuite('TestSuite\\UniversalLoaderTest');
 		$suite->addTestSuite('TestSuite\\CoreTrackerTest');
+		
+		$suite->addTestSuite('TestSuite\\Toolset\\AllTests');
 
 		return $suite;
 	} // end suite();

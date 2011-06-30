@@ -11,7 +11,7 @@ use Phar;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 use Opl\Autoloader\PHARLoader;
-use Opl\Autoloader\ClassMapBuilder;
+use Opl\Autoloader\Toolset\ClassMapBuilder;
 require_once('PHPUnit/Framework/Error.php');
 require_once('PHPUnit/Framework/Constraint/IsEqual.php');
 require_once('PHPUnit/Runner/BaseTestRunner.php');
@@ -35,6 +35,7 @@ class PHARLoaderTest extends \PHPUnit_Framework_TestCase
 
 		$builder = new ClassMapBuilder();
 		$builder->addNamespace('Dummy', './data/');
+		$builder->buildMap();
 
 		$phar->setStub(file_get_contents(__DIR__.'/../../src/Opl/Autoloader/PHARLoader.php').'
 $loader = new PHARLoader('.var_export($builder->getMap(), true).');

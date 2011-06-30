@@ -34,6 +34,11 @@ abstract class AbstractTool
 	 * @var array
 	 */
 	protected $extensions = array();
+	/**
+	 * The namespace separator
+	 * @var string
+	 */
+	private $namespaceSeparator = '\\';
 	
 	/**
 	 * Registers a new top-level namespace to match.
@@ -42,25 +47,18 @@ abstract class AbstractTool
 	 * @param string $path The path to the namespace (without the namespace name itself).
 	 * @param string $extension The namespace file extension.
 	 */
-	public function addNamespace($namespace, $path = null, $extension = '.php')
+	public function addNamespace($namespace, $path, $extension = '.php')
 	{
 		if(isset($this->namespaces[(string)$namespace]))
 		{
 			throw new DomainException('The namespace '.$namespace.' is already added.');
 		}
-		if($path !== null)
+		$length = strlen($path);
+		if($length == 0 || $path[$length - 1] != '/')
 		{
-			$length = strlen($path);
-			if($length == 0 || $path[$length - 1] != '/')
-			{
-				$path .= '/';
-			}
-			$this->namespaces[(string)$namespace] = $path;
+			$path .= '/';
 		}
-		else
-		{
-			$this->namespaces[(string)$namespace] = $this->defaultPath;
-		}
+		$this->namespaces[(string)$namespace] = $path;
 		$this->extensions[(string)$namespace] = $extension;
 	} // end addNamespace();
 
@@ -88,6 +86,28 @@ abstract class AbstractTool
 		unset($this->namespaces[(string)$namespace]);
 		unset($this->extensions[(string)$namespace]);
 	} // end removeNamespace();
+	
+	/**
+	 * Changes the namespace separator.
+	 * 
+	 * @param string $separator The new separator
+	 * @return AbstractTool Fluent interface.
+	 */
+	public function setNamespaceSeparator($separator)
+	{
+		$this->namespaceSeparator = (string)$separator;
+		return $this;
+	} // end setNamespaceSeparator();
+	
+	/**
+	 * Returns the current namespace separator.
+	 * 
+	 * @return string
+	 */
+	public function getNamespaceSeparator()
+	{
+		return $this->namespaceSeparator;
+	} // end getNamespaceSeparator();
 	
 	/**
 	 * Translates the class name to the file name, using the algorithm from

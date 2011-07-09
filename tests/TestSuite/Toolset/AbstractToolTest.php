@@ -157,7 +157,7 @@ class AbstractToolTest extends \PHPUnit_Framework_TestCase
 		$this->assertFalse($tool->hasNamespace('Bar'));
 		$tool->toFilename('Bar\\Joe');
 	} // end testToFilenameThrowsExceptionIfNamespaceDoesNotExist();
-	
+
 	public function testToFilenameAllowsToSkipTheNamespacePath()
 	{
 		$tool = new DummyTool();

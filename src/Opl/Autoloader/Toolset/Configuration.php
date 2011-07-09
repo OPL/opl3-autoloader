@@ -11,6 +11,7 @@
  */
 namespace Opl\Autoloader\Toolset;
 use Opl\Autoloader\Exception\FileFormatException;
+use Opl\Autoloader\Exception\FileNotFoundException;
 use OutOfBoundsException;
 
 /**
@@ -52,13 +53,14 @@ class Configuration
 	/**
 	 * Imports the configuration file content into the memory.
 	 * 
+	 * @throws FileNotFoundException
 	 * @throws FileFormatException
 	 * @param type $configFile 
 	 */
 	public function __construct($configFile)
 	{
 		libxml_use_internal_errors(true);
-		$document = \simplexml_load_file($configFile);
+		$document = \simplexml_load_file($configFile);		
 		foreach (libxml_get_errors() as $error)
 		{
 			if($error->level != LIBXML_ERR_WARNING)
@@ -66,6 +68,10 @@ class Configuration
 				libxml_clear_errors();
 				throw new FileFormatException('An error occured while parsing \''.$configFile.'\': '.$error->message.' on line '.($error->line - 1));
 			}
+		}
+		if(!is_object($document))
+		{
+			throw new FileNotFoundException('Cannot open the file: '.$configFile);
 		}
 		
 		if(isset($document->{'file-header'}))
@@ -88,9 +94,12 @@ class Configuration
 				$this->processFileTag($file);
 			}
 		}
-		foreach($document->separator as $separatorTag)
+		if(isset($document->separator))
 		{
-			$this->processSeparatorTag($separatorTag);
+			foreach($document->separator as $separatorTag)
+			{
+				$this->processSeparatorTag($separatorTag);
+			}
 		}
 	} // end __construct();
 

@@ -123,14 +123,22 @@ abstract class AbstractTool
 	{
 		$className = ltrim($className, $this->namespaceSeparator);
 		
+		// PSR-0 conventions
 		foreach($this->namespaces as $namespace => $path)
 		{
 			if(0 === strpos($className, $namespace))
 			{
-				$rest = strrchr($className, $this->namespaceSeparator);
-				$replacement =
-					str_replace($this->namespaceSeparator, '/', substr($className, 0, strlen($className) - strlen($rest))).
-					str_replace(array('_', $this->namespaceSeparator), '/', $rest);
+				if(strpos($className, $this->namespaceSeparator) !== false)
+				{
+					$rest = strrchr($className, $this->namespaceSeparator);
+					$replacement =
+						str_replace($this->namespaceSeparator, '/', substr($className, 0, strlen($className) - strlen($rest))).
+						str_replace(array('_', $this->namespaceSeparator), '/', $rest);
+				}
+				else
+				{
+					$replacement = str_replace('_', '/', $className);
+				}
 				if(!$withNamespacePath)
 				{
 					return $replacement.$this->extensions[$namespace];

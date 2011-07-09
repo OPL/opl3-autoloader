@@ -130,6 +130,22 @@ class AbstractToolTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals('./foo/src/Foo/Bar/File.php', $tool->toFilename('Foo\\Bar\\File'));
 		$this->assertEquals('./foo/src/Foo/File/Name.php', $tool->toFilename('Foo\\File_Name'));
 	} // end testToFilenameReturnsTheClassName();
+
+	public function testToFilenameHandlesPSR0AndZendConventions()
+	{
+		$tool = new DummyTool();
+		$tool->addNamespace('Foo\\Bar', './bar/src/');
+		$tool->addNamespace('Foo_Joe', './joe/src/');
+		$tool->addNamespace('Foo', './foo/src/');
+		
+		$this->assertEquals('./foo/src/Foo/File.php', $tool->toFilename('Foo\\File'));
+		$this->assertEquals('./foo/src/Foo/Sub_Namespace/File/Subclass.php', $tool->toFilename('Foo\\Sub_Namespace\\File_Subclass'));
+		$this->assertEquals('./bar/src/Foo/Bar/File.php', $tool->toFilename('Foo\\Bar\\File'));
+		$this->assertEquals('./foo/src/Foo/File/Name.php', $tool->toFilename('Foo\\File_Name'));
+		$this->assertEquals('./bar/src/Foo/Bar/Joe.php', $tool->toFilename('Foo\\Bar_Joe'));
+		$this->assertEquals('./foo/src/Foo/Goo/Hoo.php', $tool->toFilename('Foo_Goo_Hoo'));
+		$this->assertEquals('./joe/src/Foo/Joe/Hoo.php', $tool->toFilename('Foo_Joe_Hoo'));
+	} // end testToFilenameHandlesPSRAndZendConventions();
 	
 	/**
 	 * @expectedException Opl\Autoloader\Exception\TranslationException

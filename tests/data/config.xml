@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<autoload>
+	<export-files>
+		<file type="serialized-class-map">./classMap.txt</file>
+		<file type="chdb-class-map">./classMap.chdb</file>
+		<file type="core-dump">./coreDump.txt</file>
+		<file type="core-export">./core.php</file>
+	</export-files>
+
+	<separator value="\">
+		<namespace name="Dummy">./</namespace>
+	</separator>
+</autoload>

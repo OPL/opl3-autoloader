@@ -11,7 +11,6 @@ use Extra\DummyTool;
 
 /**
  * @covers \Opl\Autoloader\Toolset\AbstractTool
- * @runTestsInSeparateProcesses
  */
 class AbstractToolTest extends \PHPUnit_Framework_TestCase
 {

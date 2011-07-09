@@ -11,7 +11,6 @@ use Opl\Autoloader\Toolset\ClassMapBuilder;
 
 /**
  * @covers \Opl\Autoloader\Toolset\ClassMapBuilder
- * @runTestsInSeparateProcesses
  */
 class ClassMapBuilderTest extends \PHPUnit_Framework_TestCase
 {

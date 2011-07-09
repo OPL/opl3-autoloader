@@ -109,6 +109,14 @@ $application->start();', $configuration->getFileFooter());
 	} // end testLoadNoHeadings();
 	
 	/**
+	 * @expectedException Opl\Autoloader\Exception\FileNotFoundException
+	 */
+	public function testExceptionIfFileDoesNotExist()
+	{
+		$configuration = new Configuration('./data/configs/doesNotExist.xml');
+	} // end testExceptionIfFileDoesNotExist();
+	
+	/**
 	 * @expectedException Opl\Autoloader\Exception\FileFormatException
 	 */
 	public function testLoadInvalidFile()

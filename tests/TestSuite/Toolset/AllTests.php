@@ -17,6 +17,7 @@ class AllTests extends \PHPUnit_Framework_TestSuite
 		$suite->addTestSuite('TestSuite\\Toolset\\AbstractToolTest');
 		$suite->addTestSuite('TestSuite\\Toolset\\ClassMapBuilderTest');
 		$suite->addTestSuite('TestSuite\\Toolset\\CoreDumpTest');
+		$suite->addTestSuite('TestSuite\\Toolset\\ConfigurationTest');
 		
 		return $suite;
 	} // end suite();

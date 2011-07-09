@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<autoload>
+	<export-files>
+		<file>./data/classMap.txt</file>
+	</export-files>
+</autoload>

@@ -11,6 +11,7 @@
  */
 namespace Opl\Autoloader\Toolset;
 use Opl\Autoloader\Exception\FileFormatException;
+use OutOfBoundsException;
 
 /**
  * This class allows to parse the official Open Power Autoloader configuration
@@ -62,13 +63,14 @@ class Configuration
 		{
 			if($error->level != LIBXML_ERR_WARNING)
 			{
+				libxml_clear_errors();
 				throw new FileFormatException('An error occured while parsing \''.$configFile.'\': '.$error->message.' on line '.($error->line - 1));
 			}
 		}
 		
 		if(isset($document->{'file-header'}))
 		{
-			$this->fileHeader = (string)$document->{'file-header'};
+			$this->fileHeader = trim((string)$document->{'file-header'}).PHP_EOL;
 		}
 		else
 		{
@@ -76,7 +78,7 @@ class Configuration
 		}
 		if(isset($document->{'file-footer'}))
 		{
-			$this->fileFooter = (string)$document->{'file-footer'};
+			$this->fileFooter = PHP_EOL.trim((string)$document->{'file-footer'});
 		}
 		
 		if(isset($document->{'export-files'}))
@@ -170,7 +172,7 @@ class Configuration
 	 * Returns the namespaces defined for the given namespace separator. Each namespace
 	 * is an array consisting of two keys: 'path' and 'extension'.
 	 * 
-	 * @throws OutOfRangeException
+	 * @throws OutOfBoundsException
 	 * @param string $separator The namespace separator
 	 * @return array
 	 */
@@ -178,7 +180,7 @@ class Configuration
 	{
 		if(!isset($this->separators[$separator]))
 		{
-			throw new OutOfRangeException('The separator \''.$separator.' is not defined.');
+			throw new OutOfBoundsException('The separator \''.$separator.' is not defined.');
 		}
 		return $this->separators[$separator];
 	} // end getSeparatorNamespaces();
@@ -212,7 +214,7 @@ class Configuration
 	/**
 	 * Returns the file path defined for the given file type.
 	 * 
-	 * @throws OutOfRangeException If the type is not defined.
+	 * @throws OutOfBoundsException If the type is not defined.
 	 * @param string $type The type identifier.
 	 * @return string
 	 */
@@ -220,7 +222,7 @@ class Configuration
 	{
 		if(!isset($this->files[$type]))
 		{
-			throw new OutOfRangeException('The file type \''.$type.'\' is not defined.');
+			throw new OutOfBoundsException('The file type \''.$type.'\' is not defined.');
 		}
 		return $this->files[$type];
 	} // end getFile();

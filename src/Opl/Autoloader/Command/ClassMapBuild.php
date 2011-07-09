@@ -10,7 +10,7 @@
  * and other contributors. See website for details.
  */
 namespace Opl\Autoloader\Command;
-use Opl\Autoloader\ClassMapBuilder;
+use Opl\Autoloader\Toolset\ClassMapBuilder;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;

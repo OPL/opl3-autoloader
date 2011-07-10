@@ -17,7 +17,7 @@ require_once('PHPUnit/Framework/Constraint/IsEqual.php');
 require_once('PHPUnit/Runner/BaseTestRunner.php');
 
 /**
- * @covers \Opl\Autoloader\PHARLoader
+ * @covers Opl\Autoloader\PHARLoader
  * @runTestsInSeparateProcesses
  */
 class PHARLoaderTest extends \PHPUnit_Framework_TestCase
@@ -36,9 +36,28 @@ class PHARLoaderTest extends \PHPUnit_Framework_TestCase
 		$builder = new ClassMapBuilder();
 		$builder->addNamespace('Dummy', './data/');
 		$builder->buildMap();
+		
+		if(!class_exists('Opl\Autoloader\PHARLoader', false))
+		{
+			$code = file_get_contents(__DIR__.'/../../src/Opl/Autoloader/PHARLoader.php');
+			$extra = '';
+			$className = 'PHARLoader';
+		}
+		else
+		{
+			$className = 'Opl\Autoloader\PHARLoader';
+			$code = '<?php';
+			$extra = '
+$reflection = new \ReflectionObject($loader);
+$pathProperty = $reflection->getProperty(\'path\');
+$pathProperty->setAccessible(true);				
+$pathProperty->setValue($loader, __FILE__);
+';
+		}
 
-		$phar->setStub(file_get_contents(__DIR__.'/../../src/Opl/Autoloader/PHARLoader.php').'
-$loader = new PHARLoader('.var_export($builder->getMap(), true).');
+		$phar->setStub($code.'
+$loader = new '.$className.'('.var_export($builder->getMap(), true).');
+'.$extra.'
 $loader->register();
 __HALT_COMPILER();');
 

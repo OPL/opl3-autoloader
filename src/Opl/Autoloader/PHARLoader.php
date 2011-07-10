@@ -27,6 +27,11 @@ class PHARLoader
 	 * @internal
 	 */
 	protected $classMap;
+	/**
+	 * The path to the PHAR file (for testing purposes only.
+	 * @var string
+	 */
+	protected $path = __FILE__;
 
 	/**
 	 * Creates the class map loader and loads the map into the memory.
@@ -68,7 +73,7 @@ class PHARLoader
 		{
 			return false;
 		}
-		require('phar://'.__FILE__.'/'.$this->classMap[$className][1]);
+		require('phar://'.$this->path.'/'.$this->classMap[$className][1]);
 		return true;
 	} // end loadClass();
 } // end PHARLoader;

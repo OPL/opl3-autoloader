@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<autoload>
+	<file-header><![CDATA[
+<?php
+/**
+ * The index.php beginning
+ */
+]]></file-header>
+	<file-footer><![CDATA[
+$application = new Application();
+$application->start();
+	]]></file-footer>
+
+	<export-files>
+		<file type="serialized-class-map">./data/classMap.txt</file>
+		<file type="chdb-class-map">./data/classMap.chdb</file>
+		<file type="core-dump">./data/coreDump.txt</file>
+		<file type="core-export">./web/core.php</file>
+
+		<file type="index">./web/index.php</file>
+		<file type="cli">./cli/cli.php</file>
+	</export-files>
+
+	<separator value="\">
+		<namespace name="Opl">./src/Opl</namespace>
+		<namespace name="Symfony" extension=".php">./src/Symfony</namespace>
+		<namespace name="Doctrine\DBAL">./src/DBAL</namespace>
+		<namespace name="Doctrine\ORM" extension=".php5">./src/ORM</namespace>
+	</separator>
+	
+	<separator value="_">
+		<namespace name="Zend">./src/Zend</namespace>
+	</separator>
+</autoload>

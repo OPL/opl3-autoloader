@@ -10,6 +10,8 @@
  * and other contributors. See website for details.
  */
 namespace Opl\Autoloader\Command;
+use Opl\Autoloader\Toolset\Configuration;
+use Opl\Autoloader\Toolset\CoreDump as CoreDumpTool;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,30 +37,24 @@ class CoreDump extends Command
 		$this->ignoreValidationErrors = true;
 		
 		$this->setDefinition(array(
-			new InputArgument('definition', InputArgument::REQUIRED, 'The class location definition INI file'),
-			new InputArgument('core', InputArgument::OPTIONAL, 'The core file location, unless specified in the INI file.'),
+			new InputArgument('configuration', InputArgument::REQUIRED, 'The OPA configuration file.'),
 		))
-			->setName('opl:autoloader:core-dump-load')
+			->addOption('core', 'c', InputOption::VALUE_REQUIRED, 'The path to the core file.')
+			->addOption('export-type', 'e', InputOption::VALUE_REQUIRED, 'Export type: \'require\' or \'concat\'')
+			->addOption('strip-comments', 's', InputOption::VALUE_NONE, 'Strip comment headers in the concatenated files.')
+			->setName('opl:autoloader:core-dump-export')
 			->setDescription('Generates a list of require statements that load the common application core.')
 			->setHelp(<<<EOF
 Use the <info>CoreTracker</info> autoloader decorator to find the common application
 core by sending some HTTP requests. The more requests you perform, the more precise
-the lookup is. The configuration for the command is given as
-an INI file, where each entry represents a single top-level namespace and a path to its code:
+the lookup is. The command requires the path to the Open Power Autoloader XML configuration
+file to be passed. Please refer to the library manual to read more about it.
 
-  [config]
-  coreDump = "./output/core.txt"
-  coreLoadOutput = "./application/core.php"
-  namespaceSeparator = "\\"
-  extension = ".php"
-
-  [namespaces]
-  Opl = "../libs/"
-  Foo = "../libs/"
-  Bar = "../other/"
-
-It is recommended for the paths to have the trailing slashes prepended. The coreDump
-value can be also provided as a command argument. The INI setting is ignored then.
+The default export type is \'require\' which generates a list of \'require\' statements
+that load the core files. Another supported type is \'concat\' which concatenates the
+core files into a single PHP file. Use it with -s option to strip the header comments
+from the concatenated files. The concatenation is safe both for namespaces and non-namespaced
+code.
 EOF
 			);
 	} // end configure();
@@ -68,67 +64,62 @@ EOF
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		$definition = $input->getArgument('definition');
-		if(!$definition)
+		try
 		{
-			$output->writeln('<error>No definition file specified!</error>');
-			return;
+			$configuration = new Configuration($input->getArgument('configuration'));
 		}
-		$data = parse_ini_file($definition, true);
-		if(!is_array($data))
+		catch(RuntimeException $exception)
 		{
-			$output->writeln('<error>Invalid INI structure in the definition file!</error>');
+			$output->writeln('<error>An error occured: '.$exception->getMessage().'</error>');
 			return;
-		}
-
-		$coreDump = $input->getArgument('core');
-		if($coreDump)
-		{
-			$data['config']['coreDump'] = $coreDump;
 		}
 		
-		if(!file_exists($data['config']['coreDump']))
+		$core = $input->getOption('core');
+		if(!$configuration->hasFile('core-dump') && empty($core))
 		{
-			$output->writeln('<error>Cannot open the core dump file!</error>');
+			$output->writeln('<error>The path to the core dump file is missing.</error>');
+			$output->writeln('Hint: add \'core-dump\' file type to export-files section or use the --core option.');
 			return;
 		}
-		$dump = unserialize(file_get_contents($data['config']['coreDump']));
-		$outFile = fopen($data['config']['coreLoadOutput'], 'w');
-		fwrite($outFile, '<'.'?php'.PHP_EOL);
-		
-		foreach($dump as $className)
+		elseif(empty($core))
 		{
-			$fileName = $this->toFilename($data['namespaces'], $data['config']['namespaceSeparator'], $className, $output);
-			if(false !== $fileName)
+			$core = $configuration->getFile('core-dump');
+		}
+		if(!$configuration->hasFile('core-export'))
+		{
+			$output->writeln('<error>The path to the core export file is missing.</error>');
+			$output->writeln('Hint: add \'core-export\' file type to export-files section.');
+			return;
+		}
+		$exportType = $input->getOption('export-type');
+		if(empty($exportType))
+		{
+			$exportType = 'require';
+		}
+		elseif($exportType != 'require' && $exportType != 'concat')
+		{
+			$output->writeln('<error>Invalid value for the --export-type option: \'require\' or \'concat\' expected.</error>');
+			return;
+		}
+		
+		$dump = new CoreDumpTool();
+		foreach($configuration->getSeparators() as $separator)
+		{
+			foreach($configuration->getSeparatorNamespaces($separator) as $name => $namespace)
 			{
-				fwrite($outFile, 'require(\''.$fileName.$data['config']['extension'].'\');'.PHP_EOL);
+				$dump->addNamespace($name, $namespace['path'], $namespace['extension']);
 			}
 		}
-		fclose($outFile);
-		$output->writeln('<info>Core loading file generated.</info>');
-	} // end execute();
-	
-	/**
-	 * Returns the file name for the given class name.
-	 *
-	 * @param array $namespaces The list of available namespaces.
-	 * @param string $className The class name to translate.
-	 * @param OutputInterface $output The output interface.
-	 */
-	protected function toFilename(array $namespaces, $namespaceSeparator, $className, OutputInterface $output)
-	{
-		$className = ltrim($className, $namespaceSeparator);
-		$match = strstr($className, $namespaceSeparator, true);
-
-		if(false === $match || !isset($namespaces[$match]))
+		$dump->loadCore($core);
+		if($exportType == 'require')
 		{
-			return false;
+			$dump->exportRequireList($configuration->getFile('core-export'));
 		}
-		$rest = strrchr($className, $namespaceSeparator);
-		$replacement =
-			str_replace($namespaceSeparator, '/', substr($className, 0, strlen($className) - strlen($rest))).
-			str_replace(array('_', $namespaceSeparator), '/', $rest);
+		else
+		{
+			$dump->exportConcatenated($configuration->getFile('core-export'), $input->getOption('strip-comments') ? true : false);
+		}
 		
-		return $namespaces[$match].$replacement;
-	} // end toFilename();
+		$output->writeln('<info>The core loader has been successfully exported.</info>');
+	} // end execute();
 } // end CoreDump;

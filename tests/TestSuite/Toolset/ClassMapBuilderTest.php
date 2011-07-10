@@ -6,12 +6,11 @@
  * @copyright Copyright (c) 2009 Invenzzia Group
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-namespace TestSuite;
-use Opl\Autoloader\ClassMapBuilder;
+namespace TestSuite\Toolset;
+use Opl\Autoloader\Toolset\ClassMapBuilder;
 
 /**
- * @covers \Opl\Autoloader\ClassMapBuilder
- * @runTestsInSeparateProcesses
+ * @covers \Opl\Autoloader\Toolset\ClassMapBuilder
  */
 class ClassMapBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,7 +18,8 @@ class ClassMapBuilderTest extends \PHPUnit_Framework_TestCase
 	{
 		$builder = new ClassMapBuilder();
 
-		$errors = $builder->addNamespace('Dummy', './data/');
+		$builder->addNamespace('Dummy', './data/');
+		$errors = $builder->buildMap();
 
 		$this->assertEquals(array('Not a valid class file: ./data/Dummy/Subdirectory/InvalidFile.php'), $errors);
 		$this->assertEquals(array(
@@ -36,7 +36,8 @@ class ClassMapBuilderTest extends \PHPUnit_Framework_TestCase
 	{
 		$builder = new ClassMapBuilder();
 
-		$errors = $builder->addNamespace('Dummy', './data');
+		$builder->addNamespace('Dummy', './data');
+		$errors = $builder->buildMap();
 
 		$this->assertEquals(array('Not a valid class file: ./data/Dummy/Subdirectory/InvalidFile.php'), $errors);
 		$this->assertEquals(array(
@@ -53,10 +54,12 @@ class ClassMapBuilderTest extends \PHPUnit_Framework_TestCase
 	{
 		$builder = new ClassMapBuilder();
 
-		$errors = $builder->addNamespace('Dummy', './data/');
-		$errors = $builder->addNamespace('Dummy2', './data/');
+		$builder->addNamespace('Dummy', './data/');
+		$builder->addNamespace('Dummy2', './data/');
+		$errors = $builder->buildMap();
+		
 
-		$this->assertEquals(array(), $errors);
+		$this->assertEquals(array('Not a valid class file: ./data/Dummy/Subdirectory/InvalidFile.php'), $errors);
 		$this->assertEquals(array(
 			'Dummy\\ShortFile' => array(0 => 'Dummy2', 1 => 'Dummy2/ShortFile.php'),
 			'Dummy\\LongFile' => array(0 => 'Dummy', 1 => 'Dummy/LongFile.php'),
@@ -77,7 +80,8 @@ class ClassMapBuilderTest extends \PHPUnit_Framework_TestCase
 		{
 			$builder = new ClassMapBuilder();
 
-			$errors = $builder->addNamespace('TraitTest', './data/');
+			$builder->addNamespace('TraitTest', './data/');
+			$errors = $builder->buildMap();
 
 			$this->assertEquals(array(), $errors);
 			$this->assertEquals(array(

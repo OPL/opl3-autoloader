@@ -14,6 +14,7 @@ class AllTests extends \PHPUnit_Framework_TestSuite
 	{
 		$suite = new AllTests('TestSuite');
 
+		$suite->addTestSuite('TestSuite\\ExceptionTest');
 		$suite->addTestSuite('TestSuite\\GenericLoaderTest');
 		$suite->addTestSuite('TestSuite\\ClassMapLoaderTest');
 		$suite->addTestSuite('TestSuite\\PHARLoaderTest');

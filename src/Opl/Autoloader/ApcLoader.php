@@ -10,6 +10,8 @@
  * and other contributors. See website for details.
  */
 namespace Opl\Autoloader;
+use DomainException;
+use RuntimeException;
 
 /**
  * A modification of the <tt>ClassMapLoader</tt> which allows to use
@@ -24,7 +26,6 @@ class ApcLoader
 {
 	/**
 	 * The default autoloader path.
-	 * @static
 	 * @var string
 	 */
 	private $defaultPath = '';
@@ -69,7 +70,6 @@ class ApcLoader
 				throw new RuntimeException('Cannot find a class map under the specified location.');
 			}
 			$this->classMap = @unserialize(file_get_contents($this->classMapLocation));
-
 			if(!is_array($this->classMap))
 			{
 				throw new RuntimeException('The loaded file does not contain a valid class map.');

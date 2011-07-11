@@ -3,7 +3,7 @@
  * Unit tests for Open Power Autoloader
  *
  * @author Tomasz "Zyx" Jędrzejewski
- * @copyright Copyright (c) 2009 Invenzzia Group
+ * @copyright Copyright (c) 2009-2011 Invenzzia Group
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
 namespace TestSuite;

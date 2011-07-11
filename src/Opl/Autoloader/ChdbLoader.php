@@ -10,7 +10,9 @@
  * and other contributors. See website for details.
  */
 namespace Opl\Autoloader;
+use chdb;
 use DomainException;
+use Exception;
 use RuntimeException;
 
 /**
@@ -59,7 +61,14 @@ class ChdbLoader
 	{
 		$this->setDefaultPath($defaultPath);
 		$this->classMapLocation = $classMapLocation;
-		$this->classMap = new chdb($this->classMapLocation);
+		try
+		{
+			$this->classMap = new chdb($this->classMapLocation);
+		}
+		catch(Exception $exception)
+		{
+			throw new RuntimeException('Cannot find a class map under the specified location.');
+		}
 	} // end __construct();
 
 	/**
@@ -181,6 +190,7 @@ class ChdbLoader
 		{
 			return false;
 		}
+		$class = unserialize($class);
 		require($this->namespaces[$class[0]].$class[1]);
 		return true;
 	} // end loadClass();

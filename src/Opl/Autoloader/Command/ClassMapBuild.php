@@ -40,12 +40,16 @@ class ClassMapBuild extends Command
 		$this->setDefinition(array(
 			new InputArgument('configuration', InputArgument::REQUIRED, 'The Open Power Autoloader configuration'),
 		))
+			->addOption('type', 't', InputOption::VALUE_REQUIRED, 'Map type: \'serialized\' or \'chdb\'')
 			->setName('opl:autoloader:build-class-map')
 			->setDescription('Generates the class map for the ClassMapLoader')
 			->setHelp(<<<EOF
 The <info>autoloader:class-map:build</info> command is responsible for building
 the class maps for the ClassMapLoader autoloader. The configuration file is an
 XML document. Please refer to the OPA user manual to get to know more.
+
+The extra option \'type\' defines the output format: either a serialized array or
+a memory-mapped file for \'chdb\' PECL extension (Unix only).
 EOF
 			);
 	} // end configure();
@@ -65,10 +69,34 @@ EOF
 			return;
 		}
 		
-		if(!$configuration->hasFile('serialized-class-map'))
+		$type = $input->getOption('type');
+		if(empty($type))
 		{
-			$output->writeln('<error>Serialized class map file definition is missing in the configuration file!</error>');
-			$output->writeln('Hint: add \'serialized-class-map\' file type to export-files section.');
+			$type = 'serialized';
+		}
+		if($type != 'serialized' && $type != 'chdb')
+		{
+			$output->writeln('<error>Invalid type specified.</error>');
+			return;
+		}
+		switch($type)
+		{
+			case 'serialized':
+				$optionName = 'serialized-class-map';
+				break;
+			case 'chdb':
+				if(!extension_loaded('chdb'))
+				{
+					$output->writeln('<error>chdb extension is not installed.</error>');
+					return;
+				}
+				$optionName = 'chdb-class-map';
+		}
+		
+		if(!$configuration->hasFile($optionName))
+		{
+			$output->writeln('<error>The class map file definition is missing in the configuration file!</error>');
+			$output->writeln('Hint: add \''.$optionName.'\' file type to export-files section.');
 			return;
 		}
 
@@ -87,7 +115,23 @@ EOF
 			$output->writeln(preg_replace('/^(([^\:]+)\:) (.*)$/', '<error>Warning: $1</error> $3', $error));
 		}
 		
-		file_put_contents($configuration->getFile('serialized-class-map'), serialize($builder->getMap()));
-		$output->writeln('<info>Map saved as:</info> '.$configuration->getFile('serialized-class-map'));
+		if($type == 'serialized')
+		{
+			file_put_contents($configuration->getFile($optionName), serialize($builder->getMap()));
+		}
+		else
+		{
+			$fileName = $configuration->getFile($optionName);
+
+			$map = array();
+			foreach($builder->getMap() as $className => $data)
+			{
+				$map[$className] = serialize($data);
+			}
+			
+			chdb_create($fileName.'.0', $map);
+			rename($fileName.'.0', $fileName);
+		}
+		$output->writeln('<info>Map saved as:</info> '.$configuration->getFile($optionName));
 	} // end execute();
 } // end ClassMapBuild;

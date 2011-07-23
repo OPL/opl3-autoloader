@@ -24,7 +24,7 @@
 		<echo msg="Making the build directories" />
 		<mkdir dir="${project.directory.build}" />
 		<mkdir dir="${project.directory.output}" />
-    </target>
+	</target>
 
 	<!-- builds the application in order to be released -->
 	<target name="build" depends="prepare">
@@ -41,6 +41,7 @@
 				<exclude name="bootstrap.php" />
 				<exclude name="cache/**" />
 				<exclude name="coverage/**" />
+				<exclude name="data/classMap.chdb" />
 			</fileset>
 		</copy>
 		<copy file="LICENSE" tofile="${project.directory.build}/LICENSE" overwrite="true"/>

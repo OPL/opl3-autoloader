@@ -11,18 +11,18 @@
  */
 namespace Opl\Autoloader;
 use DomainException;
-use RuntimeException;
 
 /**
- * This autoloader is based on the pre-computed class location
- * map. The map can be stored in a file and optionally cached
- * in the memory.
+ * The universal class loader is a derivative of GenericLoader. The main
+ * difference is the support for registering sub-namespaces at the extra
+ * performance overhead. The loader is developed primarily for the
+ * development purposes.
  *
  * @author Tomasz Jędrzejewski
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class ClassMapLoader
+class UniversalLoader
 {
 	/**
 	 * The default autoloader path.
@@ -32,57 +32,49 @@ class ClassMapLoader
 	private $defaultPath = '';
 
 	/**
-	 * The list of available top-level namespaces.
+	 * The list of available namespaces.
 	 * @var array
 	 */
 	private $namespaces = array();
+
 	/**
-	 * The loaded class map.
+	 * The file extensions in the namespaces.
 	 * @var array
-	 * @internal
 	 */
-	protected $classMap;
+	private $extensions = array();
 
 	/**
-	 * The location where the class map is stored.
+	 * The namespace separator
 	 * @var string
-	 * @internal
 	 */
-	protected $classMapLocation;
+	private $namespaceSeparator = '\\';
 
 	/**
-	 * Creates the class map loader and loads the map into the memory.
-	 * The map must be constructed with the command line interface.
+	 * Constructs the autoloader.
 	 *
-	 * @param string $defaultPath The default location path used for newly registered namespaces
-	 * @param string $classMapLocation The class map location on the disk
+	 * @param string $defaultPath The default namespace path.
+	 * @param string $namespaceSeparator The namespace separator used in this autoloader.
 	 */
-	public function __construct($defaultPath, $classMapLocation)
+	public function __construct($defaultPath = './', $namespaceSeparator = '\\')
 	{
-		$this->setDefaultPath($defaultPath);
-		$this->classMapLocation = $classMapLocation;
+		$this->namespaceSeparator = $namespaceSeparator;
 
-		if(!file_exists($this->classMapLocation))
+		$length = strlen($defaultPath);
+		if($length == 0 || $defaultPath[$length - 1] != '/')
 		{
-			throw new RuntimeException('Cannot find a class map under the specified location.');
+			$defaultPath .= '/';
 		}
-		$this->classMap = @unserialize(file_get_contents($this->classMapLocation));
-
-		if(!is_array($this->classMap))
-		{
-			throw new RuntimeException('The loaded file does not contain a valid class map.');
-		}
+		$this->defaultPath = $defaultPath;
 	} // end __construct();
 
 	/**
-	 * Registers a new top-level namespace to match. If no path is specified, the current
-	 * default path is taken.
+	 * Registers a new top-level namespace to match.
 	 *
-	 * @throws RuntimeException
 	 * @param string $namespace The namespace name to add.
-	 * @param string $path The path to the namespace.
+	 * @param string $path The path to the namespace (without the namespace name itself).
+	 * @param string $extension The namespace file extension.
 	 */
-	public function addNamespace($namespace, $path = null)
+	public function addNamespace($namespace, $path = null, $extension = '.php')
 	{
 		if(isset($this->namespaces[(string)$namespace]))
 		{
@@ -101,10 +93,11 @@ class ClassMapLoader
 		{
 			$this->namespaces[(string)$namespace] = $this->defaultPath;
 		}
+		$this->extensions[(string)$namespace] = $extension;
 	} // end addNamespace();
 
 	/**
-	 * Checks if the specified namespace is available.
+	 * Checks if the specified top-level namespace is available.
 	 *
 	 * @param string $namespace The namespace name to check.
 	 */
@@ -116,7 +109,6 @@ class ClassMapLoader
 	/**
 	 * Removes a registered top-level namespace.
 	 *
-	 * @throws RuntimeException
 	 * @param string $namespace The namespace name to remove.
 	 */
 	public function removeNamespace($namespace)
@@ -126,7 +118,28 @@ class ClassMapLoader
 			throw new DomainException('The namespace '.$namespace.' is not available.');
 		}
 		unset($this->namespaces[(string)$namespace]);
+		unset($this->extensions[(string)$namespace]);
 	} // end removeNamespace();
+
+	/**
+	 * Sets the namespace separator used by classes in the namespace of this class loader.
+	 *
+	 * @param string $sep The separator to use.
+	 */
+	public function setNamespaceSeparator($sep)
+	{
+		$this->namespaceSeparator = $sep;
+	} // end setNamespaceSeparator();
+
+	/**
+	 * Gets the namespace seperator used by classes in the namespace of this class loader.
+	 *
+	 * @return string
+	 */
+	public function getNamespaceSeparator()
+	{
+		return $this->namespaceSeparator;
+	} // end getNamespaceSeparator();
 
 	/**
 	 * Sets the default path used by the namespaces. Note that it does not affect
@@ -136,8 +149,7 @@ class ClassMapLoader
 	 */
 	public function setDefaultPath($defaultPath)
 	{
-		$length = strlen($defaultPath);
-		if($length == 0 || $defaultPath[$length - 1] != '/')
+		if($defaultPath[strlen($defaultPath) - 1] != '/')
 		{
 			$defaultPath .= '/';
 		}
@@ -155,16 +167,6 @@ class ClassMapLoader
 	} // end getDefaultPath();
 
 	/**
-	 * Returns the current class map location.
-	 * 
-	 * @return string
-	 */
-	public function getClassMapLocation()
-	{
-		return $this->classMapLocation;
-	} // end getClassMapLocation();
-
-	/**
 	 * Installs this class loader on the SPL autoload stack.
 	 */
 	public function register()
@@ -174,25 +176,34 @@ class ClassMapLoader
 
 	/**
 	 * Uninstalls this class loader from the SPL autoloader stack.
-	 */
+	*/
 	public function unregister()
 	{
 		spl_autoload_unregister(array($this, 'loadClass'));
 	} // end unregister();
 
 	/**
-	 * Attempts to load the specified class from a file.
+	 * Loads the given class or interface.
 	 *
-	 * @param string $className The class name.
-	 * @return boolean
+	 * @param string $className The name of the class to load.
+	 * @return void
 	 */
 	public function loadClass($className)
-	{
-		if(!isset($this->classMap[$className]))
+	{		
+		$className = ltrim($className, $this->namespaceSeparator);
+		
+		foreach($this->namespaces as $namespace => $path)
 		{
-			return false;
+			if(0 === strpos($className, $namespace))
+			{
+				$rest = strrchr($className, $this->namespaceSeparator);
+				$replacement =
+					str_replace($this->namespaceSeparator, '/', substr($className, 0, strlen($className) - strlen($rest))).
+					str_replace(array('_', $this->namespaceSeparator), '/', $rest);
+				require($path.$replacement.$this->extensions[$namespace]);
+				return true;
+			}
 		}
-		require($this->namespaces[$this->classMap[$className][0]].$this->classMap[$className][1]);
-		return true;
+		return false;
 	} // end loadClass();
-} // end ClassMapLoader;
+} // end UniversalLoader;

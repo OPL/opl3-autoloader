@@ -12,6 +12,7 @@
 	<filter>
 		  <blacklist>
 				<directory suffix=".php">./</directory>
+				<directory suffix=".php">../src/Opl/Autoloader/Command</directory>
 		  </blacklist>
 		  <whitelist>
 				<directory suffix=".php">../src/</directory>

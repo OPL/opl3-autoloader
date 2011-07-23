@@ -10,13 +10,15 @@
  * and other contributors. See website for details.
  */
 namespace Opl\Autoloader\Command;
-use Opl\Autoloader\ClassMapBuilder;
+use Opl\Autoloader\Toolset\ClassMapBuilder;
+use Opl\Autoloader\Toolset\Configuration;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Command\Command;
+use RuntimeException;
 
 /**
  * This command line interface command is responsible for building
@@ -29,12 +31,6 @@ use Symfony\Component\Console\Command\Command;
 class ClassMapBuild extends Command
 {
 	/**
-	 * The class map builder.
-	 * @var ClassMapBuilder
-	 */
-	protected $_builder;
-
-	/**
 	 * @see Command
 	 */
 	protected function configure()
@@ -42,25 +38,18 @@ class ClassMapBuild extends Command
 		$this->ignoreValidationErrors = true;
 
 		$this->setDefinition(array(
-			new InputArgument('definition', InputArgument::REQUIRED, 'The class map definition INI file'),
+			new InputArgument('configuration', InputArgument::REQUIRED, 'The Open Power Autoloader configuration'),
 		))
+			->addOption('type', 't', InputOption::VALUE_REQUIRED, 'Map type: \'serialized\' or \'chdb\'')
 			->setName('opl:autoloader:build-class-map')
 			->setDescription('Generates the class map for the ClassMapLoader')
 			->setHelp(<<<EOF
 The <info>autoloader:class-map:build</info> command is responsible for building
-the class maps for the ClassMapLoader autoloader. The configuration is given as
-an INI file, where each entry represents a single top-level namespace and a path to its code:
+the class maps for the ClassMapLoader autoloader. The configuration file is an
+XML document. Please refer to the OPA user manual to get to know more.
 
-  [config]
-  outputFile = "./data/classMap.txt"
-  extension = "./php"
-  
-  [namespaces]
-  Opl = "../libs/"
-  Foo = "../libs/"
-  Bar = "../other/"
-
-It is recommended for the paths to have the trailing slashes prepended.
+The extra option \'type\' defines the output format: either a serialized array or
+a memory-mapped file for \'chdb\' PECL extension (Unix only).
 EOF
 			);
 	} // end configure();
@@ -70,64 +59,79 @@ EOF
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		$definition = $input->getArgument('definition');
-		if(!$definition)
+		try
 		{
-			$output->writeln('<error>No definition file specified!</error>');
+			$configuration = new Configuration($input->getArgument('configuration'));
+		}
+		catch(RuntimeException $exception)
+		{
+			$output->writeln('<error>An error occured: '.$exception->getMessage().'</error>');
+			return;
+		}
+		
+		$type = $input->getOption('type');
+		if(empty($type))
+		{
+			$type = 'serialized';
+		}
+		if($type != 'serialized' && $type != 'chdb')
+		{
+			$output->writeln('<error>Invalid type specified.</error>');
+			return;
+		}
+		switch($type)
+		{
+			case 'serialized':
+				$optionName = 'serialized-class-map';
+				break;
+			case 'chdb':
+				if(!extension_loaded('chdb'))
+				{
+					$output->writeln('<error>chdb extension is not installed.</error>');
+					return;
+				}
+				$optionName = 'chdb-class-map';
+		}
+		
+		if(!$configuration->hasFile($optionName))
+		{
+			$output->writeln('<error>The class map file definition is missing in the configuration file!</error>');
+			$output->writeln('Hint: add \''.$optionName.'\' file type to export-files section.');
 			return;
 		}
 
-		if(!file_exists($definition))
+		$builder = new ClassMapBuilder();
+		
+		foreach($configuration->getSeparators() as $separator)
 		{
-			$output->writeln('<error>The specified definition file does not exist!</error>');
-		}
-		$data = parse_ini_file($definition, true);
-		if(!is_array($data))
-		{
-			$output->writeln('<error>Invalid INI structure in the definition file!</error>');
-		}
-
-		$extension = 'php';
-		$outputFile = './class-map.txt';
-		if(isset($data['config']))
-		{
-			if(isset($data['config']['extension']))
+			foreach($configuration->getSeparatorNamespaces($separator) as $name => $namespace)
 			{
-				$extension = $data['config']['extension'];
-			}
-			if(isset($data['config']['outputFile']))
-			{
-				$outputFile = $data['config']['outputFile'];
+				$builder->addNamespace($name, $namespace['path'], $namespace['extension']);
 			}
 		}
-
-		if(!isset($data['namespaces']))
-		{
-			$output->writeln('<error>No namespaces specified!</error>');
-		}
-
-		$this->_builder = new ClassMapBuilder();
-		foreach($data['namespaces'] as $name => $path)
-		{
-			$this->_processSingleNamespace($output, $name, $path, $extension);
-		}
-		file_put_contents($outputFile, serialize($this->_builder->getMap()));
-		$output->writeln('<info>Map saved as:</info> '.$outputFile);
-	} // end execute();
-
-	/**
-	 * Processes a single top-level namespace.
-	 *
-	 * @param string $name
-	 * @param string $path
-	 */
-	protected function _processSingleNamespace(OutputInterface $output, $namespaceName, $path, $extension)
-	{
-		$errors = $this->_builder->addNamespace($namespaceName, $path, $extension);
-
+		$errors = $builder->buildMap();
 		foreach($errors as $error)
 		{
-			$output->writeln(preg_replace('/^(([^\:]+)\:) (.*)$/', '<error>$1</error> $3', $error));
+			$output->writeln(preg_replace('/^(([^\:]+)\:) (.*)$/', '<error>Warning: $1</error> $3', $error));
 		}
-	} // end _processSingleNamespace();
+		
+		if($type == 'serialized')
+		{
+			file_put_contents($configuration->getFile($optionName), serialize($builder->getMap()));
+		}
+		else
+		{
+			$fileName = $configuration->getFile($optionName);
+
+			$map = array();
+			foreach($builder->getMap() as $className => $data)
+			{
+				$map[$className] = serialize($data);
+			}
+			
+			chdb_create($fileName.'.0', $map);
+			rename($fileName.'.0', $fileName);
+		}
+		$output->writeln('<info>Map saved as:</info> '.$configuration->getFile($optionName));
+	} // end execute();
 } // end ClassMapBuild;

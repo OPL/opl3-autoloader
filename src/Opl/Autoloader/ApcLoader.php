@@ -14,19 +14,18 @@ use DomainException;
 use RuntimeException;
 
 /**
- * This autoloader is based on the pre-computed class location
- * map. The map can be stored in a file and optionally cached
- * in the memory.
- *
+ * A modification of the <tt>ClassMapLoader</tt> which allows to use
+ * Advanced PHP Cache to store the class map instead of loading it
+ * from a file.
+ * 
  * @author Tomasz Jędrzejewski
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class ClassMapLoader
+class ApcLoader
 {
 	/**
 	 * The default autoloader path.
-	 * @static
 	 * @var string
 	 */
 	private $defaultPath = '';
@@ -56,21 +55,26 @@ class ClassMapLoader
 	 *
 	 * @param string $defaultPath The default location path used for newly registered namespaces
 	 * @param string $classMapLocation The class map location on the disk
+	 * @param string @apcKey The APC cache key
 	 */
-	public function __construct($defaultPath, $classMapLocation)
+	public function __construct($defaultPath, $classMapLocation, $apcKey)
 	{
 		$this->setDefaultPath($defaultPath);
 		$this->classMapLocation = $classMapLocation;
 
-		if(!file_exists($this->classMapLocation))
-		{
-			throw new RuntimeException('Cannot find a class map under the specified location.');
-		}
-		$this->classMap = @unserialize(file_get_contents($this->classMapLocation));
-
+		$this->classMap = apc_fetch($apcKey);
 		if(!is_array($this->classMap))
 		{
-			throw new RuntimeException('The loaded file does not contain a valid class map.');
+			if(!file_exists($this->classMapLocation))
+			{
+				throw new RuntimeException('Cannot find a class map under the specified location.');
+			}
+			$this->classMap = @unserialize(file_get_contents($this->classMapLocation));
+			if(!is_array($this->classMap))
+			{
+				throw new RuntimeException('The loaded file does not contain a valid class map.');
+			}
+			apc_store($apcKey, $this->classMap);
 		}
 	} // end __construct();
 
@@ -195,4 +199,4 @@ class ClassMapLoader
 		require($this->namespaces[$this->classMap[$className][0]].$this->classMap[$className][1]);
 		return true;
 	} // end loadClass();
-} // end ClassMapLoader;
+} // end ApcLoader;

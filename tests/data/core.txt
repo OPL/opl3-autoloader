@@ -1,0 +1,1 @@
+a:4:{i:0;s:15:"Dummy\ShortFile";i:1;s:29:"Dummy\DifferentNamespaceStyle";i:2;s:30:"Dummy_Subdirectory_NoNamespace";i:3;s:32:"Dummy\Subdirectory\SubdirSupport";}

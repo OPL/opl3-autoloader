@@ -7,5 +7,6 @@ build.properties
 tests/cache/*
 tests/coverage/*
 tests/bootstrap.php
+tests/data/classMap.chdb
 catalog.xml
 nbproject/*

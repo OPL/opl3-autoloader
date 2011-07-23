@@ -7,17 +7,25 @@
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
 namespace TestSuite;
-use Opl\Autoloader\ClassMapLoader;
+use Opl\Autoloader\ChdbLoader;
 
 /**
- * @covers \Opl\Autoloader\ClassMapLoader
+ * @covers \Opl\Autoloader\ChdbLoader
  * @runTestsInSeparateProcesses
  */
-class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
+class ChdbLoaderTest extends \PHPUnit_Framework_TestCase
 {
+	public function setUp()
+	{
+		if(!extension_loaded('chdb'))
+		{
+			$this->markTestSkipped('chdb extension is not installed.');
+		}
+	} // end setUp();
+	
 	public function testLoaderInitialization()
 	{
-		$loader = new ClassMapLoader('./data/', './data/classMap.txt');
+		$loader = new ChdbLoader('./data/', './data/classMap.chdb');
 		$this->assertEquals('./data/', $loader->getDefaultPath());
 	} // end testLoaderInitialization();
 	
@@ -26,7 +34,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testConstructorThrowsExceptionIfFileDoesNotExist()
 	{
-		$loader = new ClassMapLoader('./data/', './data/not_exist.txt');
+		$loader = new ChdbLoader('./data/', './data/not_exist.chdb');
 	} // end testLoaderInitialization();
 
 	/**
@@ -34,13 +42,13 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testConstructorThrowsExceptionIfMapIsInvalid()
 	{
-		$loader = new ClassMapLoader('./data/', './data/invalid_map.txt');
+		$loader = new ChdbLoader('./data/', './data/invalid_map.chdb');
 	} // end testLoaderInitialization();
 	
 	public function testGetClassMapLocationReturnsTheRequestedData()
 	{
-		$loader = new ClassMapLoader('./data/', './data/classMap.txt');
-		$this->assertEquals('./data/classMap.txt', $loader->getClassMapLocation());
+		$loader = new ChdbLoader('./data/', './data/classMap.chdb');
+		$this->assertEquals('./data/classMap.chdb', $loader->getClassMapLocation());
 	} // end testGetClassMapLocationReturnsTheRequestedData();
 	
 	/**
@@ -48,7 +56,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testConstructorAppendsSlash()
 	{
-		$loader = new ClassMapLoader('./foo/bar', './data/classMap.txt');
+		$loader = new ChdbLoader('./foo/bar', './data/classMap.chdb');
 		$this->assertEquals('./foo/bar/', $loader->getDefaultPath());
 	} // end testConstructorAppendsSlash();
 
@@ -57,13 +65,13 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testConstructorAppendsSlashToEmptyString()
 	{
-		$loader = new ClassMapLoader('', './data/classMap.txt');
+		$loader = new ChdbLoader('', './data/classMap.chdb');
 		$this->assertEquals('/', $loader->getDefaultPath());
 	} // end testConstructorAppendsSlash();
 
 	public function testSetDefaultPath()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ChdbLoader('./foo/bar/', './data/classMap.chdb');
 		$this->assertEquals('./foo/bar/', $loader->getDefaultPath());
 
 		$loader->setDefaultPath('./bar/joe/');
@@ -75,14 +83,14 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testSetDefaultPathAppendsSlash()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ChdbLoader('./foo/bar/', './data/classMap.chdb');
 		$loader->setDefaultPath('./bar/joe');
 		$this->assertEquals('./bar/joe/', $loader->getDefaultPath());
 	} // end testSetDefaultPathAppendsSlash();
 
 	public function testAddingNamespace()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ChdbLoader('./foo/bar/', './data/classMap.chdb');
 
 		$this->assertFalse($loader->hasNamespace('Foo'));
 		$this->assertFalse($loader->hasNamespace('Bar'));
@@ -95,7 +103,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testAddNamespaceSetsDefaultPath()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ChdbLoader('./foo/bar/', './data/classMap.chdb');
 		$loader->addNamespace('Foo');
 
 		$reflection = new \ReflectionObject($loader);
@@ -107,7 +115,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testAddNamespaceSetsCustomPath()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ChdbLoader('./foo/bar/', './data/classMap.chdb');
 		$loader->addNamespace('Foo', './bar/joe/');
 
 		$reflection = new \ReflectionObject($loader);
@@ -119,7 +127,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	
 	public function testAddNamespaceAddsTrailingSlash()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ChdbLoader('./foo/bar/', './data/classMap.chdb');
 		$loader->addNamespace('Foo', './bar/joe');
 		
 		$reflection = new \ReflectionObject($loader);
@@ -134,7 +142,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testAddNamespaceThrowsExceptionWhenNamespaceExists()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ChdbLoader('./foo/bar/', './data/classMap.chdb');
 		$loader->addNamespace('Foo');
 		$this->assertTrue($loader->hasNamespace('Foo'));
 		$loader->addNamespace('Foo');
@@ -142,7 +150,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testRemoveNamespace()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ChdbLoader('./foo/bar/', './data/classMap.chdb');
 		$loader->addNamespace('Foo');
 		$this->assertTrue($loader->hasNamespace('Foo'));
 
@@ -164,14 +172,14 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testRemoveNamespaceThrowsExceptionWhenNamespaceDoesNotExist()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ChdbLoader('./foo/bar/', './data/classMap.chdb');
 		$this->assertFalse($loader->hasNamespace('Moo'));
 		$loader->removeNamespace('Moo');
 	} // end testRemoveNamespaceThrowsExceptionWhenNamespaceDoesNotExist();
 
 	public function testRegisterWorks()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ChdbLoader('./foo/bar/', './data/classMap.chdb');
 		$loader->register();
 
 		$functions = spl_autoload_functions();
@@ -180,7 +188,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testUnregisterWorks()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ChdbLoader('./foo/bar/', './data/classMap.chdb');
 		$loader->register();
 
 		$functions = spl_autoload_functions();
@@ -194,7 +202,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testLoadingClasses()
 	{
-		$loader = new ClassMapLoader('./data/', './data/classMap.txt');
+		$loader = new ChdbLoader('./data/', './data/classMap.chdb');
 		$loader->addNamespace('Dummy');
 		$loader->register();
 
@@ -204,7 +212,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testSkippingUnknownClasses()
 	{
-		$loader = new ClassMapLoader('./data/', './data/classMap.txt');
+		$loader = new ChdbLoader('./data/', './data/classMap.chdb');
 		$loader->addNamespace('Dummy');
 		$loader->register();
 
@@ -214,4 +222,4 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 		spl_autoload_call('Foo\\Bar');
 		$this->assertEquals('yey', ob_get_clean());
 	} // end testSkippingUnknownClasses();
-} // end ClassMapLoaderTest;
+} // end ChdbLoaderTest;

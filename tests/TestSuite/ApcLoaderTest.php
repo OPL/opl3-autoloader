@@ -7,26 +7,44 @@
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
 namespace TestSuite;
-use Opl\Autoloader\ClassMapLoader;
+use Opl\Autoloader\ApcLoader;
 
 /**
- * @covers \Opl\Autoloader\ClassMapLoader
+ * @covers \Opl\Autoloader\ApcLoader
  * @runTestsInSeparateProcesses
  */
-class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
+class ApcLoaderTest extends \PHPUnit_Framework_TestCase
 {
 	public function testLoaderInitialization()
 	{
-		$loader = new ClassMapLoader('./data/', './data/classMap.txt');
+		$loader = new ApcLoader('./data/', './data/classMap.txt', 'apc');
 		$this->assertEquals('./data/', $loader->getDefaultPath());
 	} // end testLoaderInitialization();
+	
+	public function testApcCachingWorks()
+	{
+		$this->assertFalse(apc_exists('apc'));
+		$loader = new ApcLoader('./data/', './data/classMap.txt', 'apc');
+		$loader->addNamespace('Dummy');
+		$loader->register();
+		$this->assertTrue(apc_exists('apc'));
+		$object = new \Dummy\ShortFile();
+		$loader->unregister();
+		
+		// This should not throw an exception, because the map is already cached.
+		$loader = new ApcLoader('./data/', './data/not_exists.txt', 'apc');
+		$loader->addNamespace('Dummy');
+		$loader->register();
+		$object = new \Dummy\LongFile();
+		$loader->unregister();
+	} // end testApcCachingWorks();
 	
 	/**
 	 * @expectedException RuntimeException
 	 */
 	public function testConstructorThrowsExceptionIfFileDoesNotExist()
 	{
-		$loader = new ClassMapLoader('./data/', './data/not_exist.txt');
+		$loader = new ApcLoader('./data/', './data/not_exist.txt', 'apc');
 	} // end testLoaderInitialization();
 
 	/**
@@ -34,12 +52,12 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testConstructorThrowsExceptionIfMapIsInvalid()
 	{
-		$loader = new ClassMapLoader('./data/', './data/invalid_map.txt');
+		$loader = new ApcLoader('./data/', './data/invalid_map.txt', 'apc');
 	} // end testLoaderInitialization();
 	
 	public function testGetClassMapLocationReturnsTheRequestedData()
 	{
-		$loader = new ClassMapLoader('./data/', './data/classMap.txt');
+		$loader = new ApcLoader('./data/', './data/classMap.txt', 'apc');
 		$this->assertEquals('./data/classMap.txt', $loader->getClassMapLocation());
 	} // end testGetClassMapLocationReturnsTheRequestedData();
 	
@@ -48,7 +66,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testConstructorAppendsSlash()
 	{
-		$loader = new ClassMapLoader('./foo/bar', './data/classMap.txt');
+		$loader = new ApcLoader('./foo/bar', './data/classMap.txt', 'apc');
 		$this->assertEquals('./foo/bar/', $loader->getDefaultPath());
 	} // end testConstructorAppendsSlash();
 
@@ -57,13 +75,13 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testConstructorAppendsSlashToEmptyString()
 	{
-		$loader = new ClassMapLoader('', './data/classMap.txt');
+		$loader = new ApcLoader('', './data/classMap.txt', 'apc');
 		$this->assertEquals('/', $loader->getDefaultPath());
 	} // end testConstructorAppendsSlash();
 
 	public function testSetDefaultPath()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ApcLoader('./foo/bar/', './data/classMap.txt', 'apc');
 		$this->assertEquals('./foo/bar/', $loader->getDefaultPath());
 
 		$loader->setDefaultPath('./bar/joe/');
@@ -75,14 +93,14 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testSetDefaultPathAppendsSlash()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ApcLoader('./foo/bar/', './data/classMap.txt', 'apc');
 		$loader->setDefaultPath('./bar/joe');
 		$this->assertEquals('./bar/joe/', $loader->getDefaultPath());
 	} // end testSetDefaultPathAppendsSlash();
 
 	public function testAddingNamespace()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ApcLoader('./foo/bar/', './data/classMap.txt', 'apc');
 
 		$this->assertFalse($loader->hasNamespace('Foo'));
 		$this->assertFalse($loader->hasNamespace('Bar'));
@@ -95,7 +113,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testAddNamespaceSetsDefaultPath()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ApcLoader('./foo/bar/', './data/classMap.txt', 'apc');
 		$loader->addNamespace('Foo');
 
 		$reflection = new \ReflectionObject($loader);
@@ -107,7 +125,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testAddNamespaceSetsCustomPath()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ApcLoader('./foo/bar/', './data/classMap.txt', 'apc');
 		$loader->addNamespace('Foo', './bar/joe/');
 
 		$reflection = new \ReflectionObject($loader);
@@ -119,7 +137,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	
 	public function testAddNamespaceAddsTrailingSlash()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ApcLoader('./foo/bar/', './data/classMap.txt', 'apc');
 		$loader->addNamespace('Foo', './bar/joe');
 		
 		$reflection = new \ReflectionObject($loader);
@@ -134,7 +152,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testAddNamespaceThrowsExceptionWhenNamespaceExists()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ApcLoader('./foo/bar/', './data/classMap.txt', 'apc');
 		$loader->addNamespace('Foo');
 		$this->assertTrue($loader->hasNamespace('Foo'));
 		$loader->addNamespace('Foo');
@@ -142,7 +160,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testRemoveNamespace()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ApcLoader('./foo/bar/', './data/classMap.txt', 'apc');
 		$loader->addNamespace('Foo');
 		$this->assertTrue($loader->hasNamespace('Foo'));
 
@@ -164,14 +182,14 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testRemoveNamespaceThrowsExceptionWhenNamespaceDoesNotExist()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ApcLoader('./foo/bar/', './data/classMap.txt', 'apc');
 		$this->assertFalse($loader->hasNamespace('Moo'));
 		$loader->removeNamespace('Moo');
 	} // end testRemoveNamespaceThrowsExceptionWhenNamespaceDoesNotExist();
 
 	public function testRegisterWorks()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ApcLoader('./foo/bar/', './data/classMap.txt', 'apc');
 		$loader->register();
 
 		$functions = spl_autoload_functions();
@@ -180,7 +198,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testUnregisterWorks()
 	{
-		$loader = new ClassMapLoader('./foo/bar/', './data/classMap.txt');
+		$loader = new ApcLoader('./foo/bar/', './data/classMap.txt', 'apc');
 		$loader->register();
 
 		$functions = spl_autoload_functions();
@@ -194,7 +212,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testLoadingClasses()
 	{
-		$loader = new ClassMapLoader('./data/', './data/classMap.txt');
+		$loader = new ApcLoader('./data/', './data/classMap.txt', 'apc');
 		$loader->addNamespace('Dummy');
 		$loader->register();
 
@@ -204,7 +222,7 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 
 	public function testSkippingUnknownClasses()
 	{
-		$loader = new ClassMapLoader('./data/', './data/classMap.txt');
+		$loader = new ApcLoader('./data/', './data/classMap.txt', 'apc');
 		$loader->addNamespace('Dummy');
 		$loader->register();
 
@@ -214,4 +232,4 @@ class ClassMapLoaderTest extends \PHPUnit_Framework_TestCase
 		spl_autoload_call('Foo\\Bar');
 		$this->assertEquals('yey', ob_get_clean());
 	} // end testSkippingUnknownClasses();
-} // end ClassMapLoaderTest;
+} // end ApcLoaderTest;

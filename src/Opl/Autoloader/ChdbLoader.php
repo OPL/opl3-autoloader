@@ -10,23 +10,24 @@
  * and other contributors. See website for details.
  */
 namespace Opl\Autoloader;
+use chdb;
 use DomainException;
+use Exception;
 use RuntimeException;
 
 /**
- * This autoloader is based on the pre-computed class location
- * map. The map can be stored in a file and optionally cached
- * in the memory.
- *
+ * A modification of the <tt>ClassMapLoader</tt> which allows to use
+ * the <tt>chdb</tt> (http://pecl.php.net/package/chdb) caching extension
+ * to store the class maps.
+ * 
  * @author Tomasz Jędrzejewski
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class ClassMapLoader
+class ChdbLoader
 {
 	/**
 	 * The default autoloader path.
-	 * @static
 	 * @var string
 	 */
 	private $defaultPath = '';
@@ -42,7 +43,6 @@ class ClassMapLoader
 	 * @internal
 	 */
 	protected $classMap;
-
 	/**
 	 * The location where the class map is stored.
 	 * @var string
@@ -55,22 +55,19 @@ class ClassMapLoader
 	 * The map must be constructed with the command line interface.
 	 *
 	 * @param string $defaultPath The default location path used for newly registered namespaces
-	 * @param string $classMapLocation The class map location on the disk
+	 * @param string $classMapLocation The chdb mapped memory file with the class map.
 	 */
 	public function __construct($defaultPath, $classMapLocation)
 	{
 		$this->setDefaultPath($defaultPath);
 		$this->classMapLocation = $classMapLocation;
-
-		if(!file_exists($this->classMapLocation))
+		try
+		{
+			$this->classMap = new chdb($this->classMapLocation);
+		}
+		catch(Exception $exception)
 		{
 			throw new RuntimeException('Cannot find a class map under the specified location.');
-		}
-		$this->classMap = @unserialize(file_get_contents($this->classMapLocation));
-
-		if(!is_array($this->classMap))
-		{
-			throw new RuntimeException('The loaded file does not contain a valid class map.');
 		}
 	} // end __construct();
 
@@ -188,11 +185,13 @@ class ClassMapLoader
 	 */
 	public function loadClass($className)
 	{
-		if(!isset($this->classMap[$className]))
+		$class = $this->classMap->get($className);
+		if(null === $class)
 		{
 			return false;
 		}
-		require($this->namespaces[$this->classMap[$className][0]].$this->classMap[$className][1]);
+		$class = unserialize($class);
+		require($this->namespaces[$class[0]].$class[1]);
 		return true;
 	} // end loadClass();
-} // end ClassMapLoader;
+} // end ChdbLoader;

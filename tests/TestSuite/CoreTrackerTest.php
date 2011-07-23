@@ -82,11 +82,15 @@ class CoreTrackerTest extends \PHPUnit_Framework_TestCase
 		$loader = new GenericLoader(\vfsStream::url(''));
 		$loader->addNamespace('Foo');
 		
+		ob_start();
+		
 		$tracker = new CoreTracker($loader, './cache/core.txt');	
 		$tracker->register();
 		$tracker->loadClass('Foo\\Bar');
 		$tracker->unregister();
 		unset($tracker);
+		
+		$this->assertEquals('FOO\BAR.PHP', ob_get_clean());
 
 		$result = unserialize(file_get_contents('./cache/core.txt'));
 		$this->assertEquals(array('Foo\\Bar'), $result);
@@ -112,6 +116,7 @@ class CoreTrackerTest extends \PHPUnit_Framework_TestCase
 		
 		unlink('./cache/core.txt');
 
+		ob_start();
 		$loader = new GenericLoader(\vfsStream::url(''));
 		$loader->addNamespace('Foo');
 		
@@ -131,6 +136,8 @@ class CoreTrackerTest extends \PHPUnit_Framework_TestCase
 		$tracker->loadClass('Foo\\Goo');
 		$tracker->unregister();
 		unset($tracker);
+		
+		$this->assertEquals('FOO\BAR.PHPFOO\JOE.PHPFOO\BAR.PHPFOO\GOO.PHP', ob_get_clean());
 
 		$result = unserialize(file_get_contents('./cache/core.txt'));
 		$this->assertEquals(array('Foo\\Bar'), $result);

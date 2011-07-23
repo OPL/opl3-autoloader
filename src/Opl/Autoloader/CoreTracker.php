@@ -80,8 +80,9 @@ class CoreTracker
 		{
 			$content .= fread($this->coreFile, 2048);
 		}
+		ftruncate($this->coreFile, 0);
 		rewind($this->coreFile);
-		$this->core = unserialize($content);
+		$this->core = @unserialize($content);
 		if(false == $this->core)
 		{
 			$this->core = array();

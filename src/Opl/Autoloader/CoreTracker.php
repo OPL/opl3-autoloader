@@ -25,10 +25,10 @@ use DomainException;
 class CoreTracker
 {
 	/**
-	 * The decorated autoloader.
-	 * @var object 
+	 * The decorated autoloaders.
+	 * @var object[]
 	 */
-	protected $autoloader;
+	protected $autoloaders = array();
 	/**
 	 * The core file name, where the results should be dumped.
 	 * @var string
@@ -56,17 +56,18 @@ class CoreTracker
 	protected $mode;
 	
 	/**
-	 * Creates the core tracker by decorating another autoloader.
-	 * 
-	 * @param object $autoloader The decorated autoloader.
+	 * If PHP 5.4 traits are available, this variable is set to true.
+	 * @var type 
 	 */
-	public function __construct($autoloader, $coreFile)
+	protected $traitsSupported = false;
+	
+	/**
+	 * Creates the core tracker.
+	 * 
+	 * @param string $coreFile The core file.
+	 */
+	public function __construct($coreFile)
 	{
-		if(!is_object($autoloader) || !method_exists($autoloader, 'loadClass'))
-		{
-			throw new DomainException('The first argument must be an autoloader object with \'loadClass\' method.');
-		}
-		$this->autoloader = $autoloader;
 		$this->coreFileName = (string)$coreFile;
 		
 		if(!file_exists($this->coreFileName))
@@ -93,6 +94,7 @@ class CoreTracker
 			$this->mode = 1;
 		}
 		$this->currentScan = array();
+		$this->traitsSupported = function_exists('trait_exists');
 	} // end __construct();
 	
 	/**
@@ -112,13 +114,30 @@ class CoreTracker
 	} // end __destruct();
 	
 	/**
-	 * Returns the decorated autoloader.
+	 * Registers a new autoloader in the core tracker. The method throws an exception,
+	 * if the registered object does not contain a <tt>loadClass</tt> method.
 	 * 
-	 * @return object 
+	 * @param object $loader The autoloader object.
+	 * @return CoreTracker Fluent interface. 
 	 */
-	public function getAutoloader()
+	public function addLoader($loader)
 	{
-		return $this->autoloader;
+		if(!is_object($loader) || !method_exists($loader, 'loadClass'))
+		{
+			throw new DomainException('The first argument must be an autoloader object with \'loadClass\' method.');
+		}
+		$this->autoloaders[] = $loader;
+		return $this;
+	} // end addLoader();
+	
+	/**
+	 * Returns the list of decorated autoloaders.
+	 * 
+	 * @return object[]
+	 */
+	public function getLoaders()
+	{
+		return $this->autoloaders;
 	} // end getAutoloader();
 	
 	/**
@@ -143,8 +162,33 @@ class CoreTracker
 	 */
 	public function loadClass($className)
 	{
-		// DO NOT CHANGE THE ORDER OR YOU'LL BREAK THE CLASS DEPENDENCIES!
-		$this->autoloader->loadClass($className);
-		$this->currentScan[] = $className;
+		if($this->traitsSupported)
+		{
+			// Code for PHP 5.4.x
+			foreach($this->autoloaders as $loader)
+			{
+				// The class must be loaded before adding it to the list.
+				$loader->loadClass($className);
+				if(class_exists($className, false) || interface_exists($className, false) || trait_exists($className, false))
+				{
+					$this->currentScan[] = $className;
+					break;
+				}
+			}
+		}
+		else
+		{
+			// Code for PHP 5.3.x
+			foreach($this->autoloaders as $loader)
+			{
+				// The class must be loaded before adding it to the list.
+				$loader->loadClass($className);
+				if(class_exists($className, false) || interface_exists($className, false))
+				{
+					$this->currentScan[] = $className;
+					break;
+				}
+			}
+		}	
 	} // end loadClass();
 } // end CoreTracker;

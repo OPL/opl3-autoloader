@@ -144,8 +144,7 @@ class CoreTracker
 	public function loadClass($className)
 	{
 		// DO NOT CHANGE THE ORDER OR YOU'LL BREAK THE CLASS DEPENDENCIES!
-		$result = $this->autoloader->loadClass($className);
+		$this->autoloader->loadClass($className);
 		$this->currentScan[] = $className;
-		return $result;		
 	} // end loadClass();
 } // end CoreTracker;

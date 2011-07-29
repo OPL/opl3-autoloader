@@ -186,12 +186,10 @@ class ChdbLoader
 	public function loadClass($className)
 	{
 		$class = $this->classMap->get($className);
-		if(null === $class)
+		if(null !== $class)
 		{
-			return false;
+			$class = unserialize($class);
+			require($this->namespaces[$class[0]].$class[1]);
 		}
-		$class = unserialize($class);
-		require($this->namespaces[$class[0]].$class[1]);
-		return true;
 	} // end loadClass();
 } // end ChdbLoader;

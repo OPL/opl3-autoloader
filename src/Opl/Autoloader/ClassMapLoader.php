@@ -188,11 +188,9 @@ class ClassMapLoader
 	 */
 	public function loadClass($className)
 	{
-		if(!isset($this->classMap[$className]))
+		if(isset($this->classMap[$className]))
 		{
-			return false;
+			require($this->namespaces[$this->classMap[$className][0]].$this->classMap[$className][1]);
 		}
-		require($this->namespaces[$this->classMap[$className][0]].$this->classMap[$className][1]);
-		return true;
 	} // end loadClass();
 } // end ClassMapLoader;

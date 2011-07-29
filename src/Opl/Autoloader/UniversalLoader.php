@@ -201,9 +201,8 @@ class UniversalLoader
 					str_replace($this->namespaceSeparator, '/', substr($className, 0, strlen($className) - strlen($rest))).
 					str_replace(array('_', $this->namespaceSeparator), '/', $rest);
 				require($path.$replacement.$this->extensions[$namespace]);
-				return true;
+				return;
 			}
 		}
-		return false;
 	} // end loadClass();
 } // end UniversalLoader;

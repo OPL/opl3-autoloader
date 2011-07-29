@@ -194,7 +194,7 @@ class GenericLoader
 
 		if(false === $match || !isset($this->namespaces[$match]))
 		{
-			return false;
+			return;
 		}
 		$rest = strrchr($className, $this->namespaceSeparator);
 		$replacement =
@@ -202,6 +202,5 @@ class GenericLoader
 			str_replace(array('_', $this->namespaceSeparator), '/', $rest);
 
 		require($this->namespaces[$match].$replacement.$this->extensions[$match]);
-		return true;
 	} // end loadClass();
 } // end GenericLoader;

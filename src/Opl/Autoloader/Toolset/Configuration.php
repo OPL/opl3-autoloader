@@ -45,6 +45,11 @@ class Configuration
 	 */
 	protected $files;
 	/**
+	 * The list of defined autoloader options.
+	 * @var string[string]
+	 */
+	protected $options = array();
+	/**
 	 * Do we have simple namespaces only in the configuration?
 	 * @var boolean
 	 */
@@ -86,6 +91,13 @@ class Configuration
 		{
 			$this->fileFooter = PHP_EOL.trim((string)$document->{'file-footer'});
 		}
+		if(isset($document->{'options'}))
+		{
+			foreach($document->{'options'}->{'option'} as $option)
+			{
+				$this->processOptionTag($option);
+			}
+		}
 		
 		if(isset($document->{'export-files'}))
 		{
@@ -118,6 +130,22 @@ class Configuration
 		}
 		$this->files[(string)$fileTag['type']] = (string)$fileTag;
 	} // end processFileTag();
+	
+	/**
+	 * Processes the <option> tag.
+	 * 
+	 * @internal
+	 * @throws FileFormatException
+	 * @param SimpleXMLElement $optionTag 
+	 */
+	protected function processOptionTag($optionTag)
+	{
+		if(!isset($optionTag['name']))
+		{
+			throw new FileFormatException('The <option> tag must have the \'name\' attribute.');
+		}
+		$this->options[(string)$optionTag['name']] = (string)$optionTag;
+	} // end processOptionTag();
 	
 	/**
 	 * Processes the <separator> tag and its contents.
@@ -246,6 +274,34 @@ class Configuration
 	{
 		return isset($this->files[$type]);
 	} // end hasFile();
+	
+	/**
+	 * Returns the specified autoloading option. If the option is not defined,
+	 * a default value is returned.
+	 * 
+	 * @param string $name The option name.
+	 * @param mixed $default The default option value.
+	 * @return mixed
+	 */
+	public function getOption($name, $default = null)
+	{
+		$name = (string)$name;
+		if(!isset($this->options[$name]))
+		{
+			return $default;
+		}
+		return $this->options[$name];
+	} // end getOption();
+	
+	/**
+	 * Returns an array containing all the configuration options.
+	 * 
+	 * @return string[string]
+	 */
+	public function getOptions()
+	{
+		return $this->options;
+	} // end getOptions();
 	
 	/**
 	 * Returns the stub file header with the autoloading code.

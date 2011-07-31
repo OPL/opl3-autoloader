@@ -38,6 +38,11 @@ $application->start();', $configuration->getFileFooter());
 		), $configuration->getFiles());
 		
 		$this->assertEquals(array(
+			'foo' => 'bar',
+			'joe' => 'goo'
+		), $configuration->getOptions());
+		
+		$this->assertEquals(array(
 			'Opl' => array('path' => './src/Opl', 'extension' => '.php'),
 			'Symfony' => array('path' => './src/Symfony', 'extension' => '.php'),
 			'Doctrine\DBAL' => array('path' => './src/DBAL', 'extension' => '.php'),
@@ -108,6 +113,21 @@ $application->start();', $configuration->getFileFooter());
 		$this->assertEquals(null, $configuration->getFileFooter());
 	} // end testLoadNoHeadings();
 	
+	public function testGetOptionReturnsOptionValue()
+	{
+		$configuration = new Configuration('./data/configs/correctConfig.xml');
+		$this->assertEquals('bar', $configuration->getOption('foo'));
+		$this->assertEquals('goo', $configuration->getOption('joe'));
+	} // end testGetOptionReturnsOptionValue();
+	
+	public function testGetOptionReturnsDefaultValueIfOptionDoesNotExist()
+	{
+		$configuration = new Configuration('./data/configs/correctConfig.xml');
+		$this->assertEquals(null, $configuration->getOption('moo'));
+		$this->assertEquals(123, $configuration->getOption('xyz', 123));
+		$this->assertEquals(456, $configuration->getOption('xyz', 456));
+	} // end testGetOptionReturnsDefaultValueIfOptionDoesNotExist();
+	
 	/**
 	 * @expectedException Opl\Autoloader\Exception\FileNotFoundException
 	 */
@@ -139,6 +159,14 @@ $application->start();', $configuration->getFileFooter());
 	{
 		$configuration = new Configuration('./data/configs/missingNamespaceAttribute.xml');
 	} // end testLoadMissingNamespaceAttribute();
+	
+	/**
+	 * @expectedException Opl\Autoloader\Exception\FileFormatException
+	 */
+	public function testLoadMissingOptionAttribute()
+	{
+		$configuration = new Configuration('./data/configs/missingOptionAttribute.xml');
+	} // end testLoadMissingOptionAttribute();
 	
 	/**
 	 * @expectedException Opl\Autoloader\Exception\FileFormatException

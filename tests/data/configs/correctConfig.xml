@@ -20,6 +20,11 @@ $application->start();
 		<file type="index">./web/index.php</file>
 		<file type="cli">./cli/cli.php</file>
 	</export-files>
+	
+	<options>
+		<option name="foo">bar</option>
+		<option name="joe">goo</option>
+	</options>
 
 	<separator value="\">
 		<namespace name="Opl">./src/Opl</namespace>

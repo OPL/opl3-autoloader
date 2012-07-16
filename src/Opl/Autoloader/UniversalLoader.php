@@ -194,15 +194,16 @@ class UniversalLoader
 		
 		foreach($this->namespaces as $namespace => $path)
 		{
-			if(0 === strpos($className, $namespace))
+			if(0 === strpos($className, $namespace . $this->namespaceSeparator))
 			{
 				$rest = strrchr($className, $this->namespaceSeparator);
 				$replacement =
 					str_replace($this->namespaceSeparator, '/', substr($className, 0, strlen($className) - strlen($rest))).
 					str_replace(array('_', $this->namespaceSeparator), '/', $rest);
 				require($path.$replacement.$this->extensions[$namespace]);
+				
 				return true;
-			}
+			} 
 		}
 		return false;
 	} // end loadClass();

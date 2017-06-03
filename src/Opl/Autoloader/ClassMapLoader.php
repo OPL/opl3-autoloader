@@ -29,7 +29,7 @@ class ClassMapLoader
 	 * @static
 	 * @var string
 	 */
-	private $defaultPath = '';
+	protected $defaultPath = '';
 
 	/**
 	 * The list of available top-level namespaces.
@@ -192,7 +192,9 @@ class ClassMapLoader
 		{
 			return false;
 		}
+		
 		require($this->namespaces[$this->classMap[$className][0]].$this->classMap[$className][1]);
+		
 		return true;
 	} // end loadClass();
 } // end ClassMapLoader;
